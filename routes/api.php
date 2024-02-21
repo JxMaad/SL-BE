@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Admin\BookController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\DashboardController;
+use App\Http\Controllers\api\admin\RestoreController;
 use App\Http\Controllers\BorrowController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -51,10 +52,14 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::prefix('borrow')->group(function () {
-        Route::get('/', [BorrowController::class, 'index'])->middleware(['permission:borrowss.index']);
-        Route::get('/{id}', [BorrowController::class, 'show'])->middleware('permission:borrowss.index');
+        Route::get('/', [BorrowController::class, 'index'])->middleware(['permission:borrows.index', 'role:admin|pustakawan']);
+        Route::get('/{id}', [BorrowController::class, 'show'])->middleware('permission:borrows.index');
         Route::post('/create', [BorrowController::class, 'store'])->middleware(['permission:borrows.create', ]);
-        Route::put('/{id}/update', [BorrowController::class, 'update'])->middleware(['permission:borrowss.edit']);
-        Route::delete('/{id}', [BorrowController::class, 'destroy'])->middleware(['permission:borrowss.delete']);
+        Route::put('/{id}/update', [BorrowController::class, 'update'])->middleware(['permission:borrows.edit']);
+        Route::delete('/{id}', [BorrowController::class, 'destroy'])->middleware(['permission:borrows.delete']);
+    });
+
+    Route::prefix('restore')->group(function () {
+        Route::get('/returnbook', [RestoreController::class, 'returnBook'])->middleware(['permission:restores']);
     });
 });

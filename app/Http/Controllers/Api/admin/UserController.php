@@ -47,6 +47,7 @@ class UserController extends Controller
             'email'        => 'required|unique:users',
             'password'     => 'required|confirmed',
             'roles'        => 'required',
+            'status'       => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -55,30 +56,37 @@ class UserController extends Controller
 
         // Fetch random image from Lorem Picsum
         $response = Http::get('https://picsum.photos/200/300');
-        $imageName = time() . '.jpg'; // Generate unique image name
-        $imagePath = 'public/users/' . $imageName; // Path to store image
 
-        // Store image in the filesystem
-        Storage::put($imagePath, $response->body());
+        // Check if the request to Lorem Picsum was successful
+        if ($response->ok()) {
+            $imageContent = $response->body();
 
-        // Create user with image filename
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => bcrypt($request->password),
-            'image'    => $imagePath, // Store only the filename in the database
-        ]);
+            // Generate unique image name
+            $imageName = time() . '.jpg';
 
-        // Assign role to user
-        $user->assignRole($request->roles);
+            // Store image in the filesystem
+            Storage::disk('public')->put('users/' . $imageName, $imageContent);
 
-        if ($user) {
-            // Return success with Api Resource
-            return new UserResource(true, 'Data User Berhasil Disimpan!', $user);
+            // Create user with image filename
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => bcrypt($request->password),
+                'image'    => $imageName, // Store only the filename in the database
+                'status'   => $request->status
+            ]);
+
+            // Assign role to user
+            $user->assignRole($request->roles);
+
+            if ($user) {
+                // Return success with Api Resource
+                return new UserResource(true, 'Data User Berhasil Disimpan!', $user);
+            }
+
+            // Return failed with Api Resource
+            return new UserResource(false, 'Data User Gagal Disimpan!', null);
         }
-
-        // Return failed with Api Resource
-        return new UserResource(false, 'Data User Gagal Disimpan!', null);
     }
 
     /**
@@ -113,7 +121,8 @@ class UserController extends Controller
             'name'           => 'required',
             'email'          => 'required|unique:users,email,' . $user->id,
             'password'       => 'sometimes|confirmed',
-            'image'          => 'sometimes|file|mimes:jpeg,jpg,png|max:2000',
+            'image'          => 'required|file|mimes:jpeg,jpg,png|max:2000',
+            'status'         => 'required'
         ]);
 
         if ($validator->fails()) {

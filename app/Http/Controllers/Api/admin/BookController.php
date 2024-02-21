@@ -149,6 +149,7 @@ class BookController extends Controller
             $image = $request->file('image');
             $image->storeAs('public/books', $image->hashName());
 
+            //update new image
             $book->update([
                 'title' => $request->input('title'),
                 'synopsis' => $request->input('synopsis'),
@@ -162,6 +163,7 @@ class BookController extends Controller
                 'status' => $request->input('status'),
             ]);
 
+            //update no image
             $book->update([
                 'title' => $request->input('title'),
                 'synopsis' => $request->input('synopsis'),

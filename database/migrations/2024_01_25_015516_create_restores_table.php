@@ -16,7 +16,6 @@ return new class extends Migration
             $table->dateTime('returndate');
             $table->integer('find')->nullable();
             $table->string('status');
-            $table->boolean('confirmation');
             $table->foreignId('book_id')->constrained('books')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('borrow_id')->unique()->constrained('borrows')->cascadeOnDelete();

@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('borrows', function (Blueprint $table) {
             $table->id();
-            $table->datetime('borrowing_date')->nullable();
+            $table->datetime('borrowing_date');
             $table->integer('borrowing_duration');
-            $table->enum('status', ['pending', 'approved', 'returned'])->default('pending');
-            $table->boolean('confirmation');
+            $table->string('status');
             $table->foreignId('book_id')->constrained('books')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
