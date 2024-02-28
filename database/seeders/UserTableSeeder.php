@@ -20,7 +20,7 @@ class UserTableSeeder extends Seeder
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('1234'),
-            'status' => 'active',
+            'status' => 'ACTIVE'
         ]);
         
         //assign permission to role

@@ -32,19 +32,25 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
 
 
-        if(!$token = auth()->guard('api')->attempt($credentials)) {
+        if (!$token = auth()->guard('api')->attempt($credentials)) {
 
             return response()->json([
                 'success' => false,
                 'message' => 'email or password is incorrect'
             ], 400);
-
         }
+
+        // Dapatkan informasi peran pengguna
+        $user = auth()->guard('api')->user();
+
+        // Ambil peran pengguna
+        $roles = $user->getRoleNames();
 
         return response()->json([
             'success' => true,
             'user' => auth()->guard('api')->user()->only(['name', 'email']),
             'permission' => auth()->guard('api')->user()->getPermissionArray(),
+            'roles' => $roles,
             'token' => $token
         ], 200);
     }

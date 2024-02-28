@@ -11,9 +11,8 @@ class Restore extends Model
 
     protected $fillable = [
         'returndate',
-        'fine',
         'status',
-        'confirmation',
+        'fine',
         'book_id',
         'user_id',
         'borrow_id',
