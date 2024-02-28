@@ -33,14 +33,24 @@ class Book extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * views
+        /**
+     * book
      * 
      * @return void
      */
-    public function views()
+    public function borrow() 
     {
-        return $this->hasMany(BookView::class);
+        return $this->belongsTo(Borrow::class);
+    }
+
+    /**
+     * restore
+     * 
+     * @return void
+     */
+    public function restore() 
+    {
+        return $this->hasOne(Restore::class);
     }
 
     /**

@@ -6,11 +6,26 @@ use Carbon\Carbon;
 use App\Models\Borrow;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BorrowResource;
 use App\Models\Book;
 use App\Models\Restore;
 
 class RestoreController extends Controller
 {
+    public function show(Restore $restore, $id)
+    {
+        //get borrow
+        $restore = Restore::whereId($id)->first();
+
+        if ($restore) {
+            //return success with Api resource
+            return new BorrowResource(true, 'Detail Data borrow', $restore);
+        }
+
+        //return failed with Api Resource
+        return new BorrowResource(false, 'Detail Data borrow Tidak Ditemukan!', null);
+    }
+
     /**
      * Memproses pengembalian buku.
      *
@@ -25,7 +40,7 @@ class RestoreController extends Controller
         // Pastikan peminjaman ditemukan
         if ($borrow) {
             // Periksa apakah status peminjaman saat ini adalah 'pending' atau 'accepted'
-            if ($borrow->status === 'pending' || $borrow->status === 'accepted') {
+            if ($borrow->status === 'accepted') {
                 // Buat data pengembalian buku
                 $returnBook = new Restore();
                 $returnBook->returndate = now();
@@ -46,6 +61,10 @@ class RestoreController extends Controller
                 $borrow->status = 'completed';
                 $borrow->save();
 
+                // Ubah status pengembalian menjadi selesai dikembalikan
+                $returnBook->status = 'returned';
+                $returnBook->save();
+
                 return response()->json(['message' => 'Buku berhasil dikembalikan.']);
             } else {
                 return response()->json(['message' => 'Buku tidak dalam status dipinjam.'], 400);
@@ -55,6 +74,29 @@ class RestoreController extends Controller
         }
     }
 
+    // /**
+    //  * Mengupdate status user dari loading menjadi active.
+    //  *
+    //  * @param  int  $id
+    //  * @return \Illuminate\Http\Response
+    //  */
+    // public function updateStatusReturn($id)
+    // {
+    //     // Temukan pengembalian berdasarkan ID
+    //     $returnBook = Restore::find($id);
+
+    //     // Pastikan pengembalian ditemukan
+    //     if ($returnBook) {
+    //         // Update status pengembalian menjadi 'active'
+    //         $returnBook->status = '';
+    //         $returnBook->save();
+
+    //         return response()->json(['message' => 'Status pengembalian berhasil diperbarui menjadi aktif.']);
+    //     } else {
+    //         // Jika pengembalian tidak ditemukan, kembalikan respon error
+    //         return response()->json(['message' => 'pengembalian tidak ditemukan.'], 404);
+    //     }
+    // }
 
     // public function returncheck($id)
     // {

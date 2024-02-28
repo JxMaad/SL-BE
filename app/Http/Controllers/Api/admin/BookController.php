@@ -220,7 +220,7 @@ class BookController extends Controller
                 $book->status = 'loaned';
                 $book->save();
 
-                return response()->json(['message' => 'Permohonan peminjaman buku berhasil diajukan.']);
+                return response()->json(['message' => 'Status buku berhasil diperbarui menjadi diterima untuk dipinjam.']);
             } else {
                 return response()->json(['message' => 'Buku tidak tersedia untuk dipinjam saat ini.'], 400);
             }

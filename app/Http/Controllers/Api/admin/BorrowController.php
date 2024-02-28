@@ -21,16 +21,9 @@ class BorrowController extends Controller
     {
         //var_dump($request->all());exit;
         $request->validate([
-            'borrowing_start' => 'required|date_format:Y-m-d H:i:s',
-            'borrowing_end'  => 'required|date_format:Y-m-d H:i:s|after:borrowing_start',
             'book_id' => 'required|exists:books,id',
             'user_id' => 'required',
         ], [
-            'borrowing_start.required' => 'Tanggal peminjaman diperlukan.',
-            'borrowing_start.date_format' => 'Format tanggal peminjaman harus Y-m-d H:i:s.',
-            'borrowing_end.required' => 'Tanggal pengembalian diperlukan.',
-            'borrowing_end.date_format' => 'Format tanggal pengembalian harus Y-m-d H:i:s.',
-            'borrowing_end.after' => 'Tanggal pengembalian harus setelah tanggal peminjaman.',
             'book_id.required' => 'ID buku diperlukan.',
             'book_id.exists' => 'Buku tidak ditemukan.',
             'user_id.required' => 'ID pengguna diperlukan.',
@@ -46,8 +39,6 @@ class BorrowController extends Controller
 
         // Create borrow jika buku tersedia
         $borrow = Borrow::create([
-            'borrowing_start' => $request->input('borrowing_start'),
-            'borrowing_end' => $request->input('borrowing_end'),
             'book_id' => $request->input('book_id'),
             'user_id' => $request->input('user_id'),
         ]);
@@ -90,24 +81,21 @@ class BorrowController extends Controller
     public function updateStatusBorrow($id)
     {
         // Temukan buku berdasarkan ID
-        $book = Book::find($id);
+        $borrow = Borrow::find($id);
 
         // Pastikan buku ditemukan
-        if ($book) {
+        if ($borrow) {
             // Periksa apakah status buku saat ini adalah 'pending'
-            if ($book->status === 'pending') {
+            if ($borrow->status === 'pending') {
                 // Update status buku menjadi 'accepted'
-                $book->status = 'accepted';
-                $book->save();
+                $borrow->status = 'accepted';
+                $borrow->save();
 
-                return response()->json(['message' => 'Status buku berhasil diperbarui menjadi diterima untuk dipinjam.']);
+                return response()->json(['message' => 'Permohonan peminjaman buku berhasil diajukan.']);
             } else {
-                // Jika buku tidak tersedia untuk dipinjam, kembalikan respon error
-                return response()->json(['message' => 'Buku tidak tersedia untuk dipinjam saat ini.'], 400);
+                // Jika buku tidak ditemukan, kembalikan respon error
+                return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
             }
-        } else {
-            // Jika buku tidak ditemukan, kembalikan respon error
-            return response()->json(['message' => 'Buku tidak ditemukan.'], 404);
         }
     }
 }
