@@ -119,23 +119,27 @@ class UserController extends Controller
          */
         $validator = Validator::make($request->all(), [
             'name'           => 'required',
-            'email'          => 'required|unique:users,email,' . $user->id,
+            'email'          => 'required',
             'password'       => 'sometimes|confirmed',
-            'image'          => 'required|file|mimes:jpeg,jpg,png|max:2000',
+            'image'          => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
+        // Mengupdate data user lainnya
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
         // Mengupdate password jika dimasukkan
         if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
+            $user->update([
+                'password' => bcrypt($request->password),
+            ]);
         }
-
-        // Mengupdate data user lainnya
-        $user->name = $request->name;
-        $user->email = $request->email;
 
         // Mengupdate gambar jika dimasukkan
         if ($request->hasFile('image')) {
@@ -144,16 +148,15 @@ class UserController extends Controller
 
             // Mengunggah gambar baru
             $imagePath = $request->file('image')->store('images', 'public');
-            $user->image = $imagePath;
+            $user->update([
+                'image' => $imagePath,
+            ]);
         }
 
         // Menyinkronkan peran pengguna jika dimasukkan
         if ($request->filled('roles')) {
             $user->syncRoles($request->roles);
         }
-
-        // Menyimpan perubahan pada pengguna
-        $user->save();
 
         // Mengembalikan respons sesuai keberhasilan atau kegagalan
         if ($user) {

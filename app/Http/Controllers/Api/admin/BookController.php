@@ -20,9 +20,7 @@ class BookController extends Controller
     public function index()
     {
         // Get all books regardless of the user
-        $books = Book::with('user')->withCount('views')->when(request()->search, function ($books) {
-            $books = $books->where('name', 'like', '%' . request()->search . '%');
-        })->latest()->paginate(5);
+        $books = Book::latest()->paginate(5);
 
         // Append query string to pagination links
         $books->appends(['search' => request()->search]);
@@ -124,21 +122,24 @@ class BookController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, book $book)
+    public function update(Request $request, book $book, $id)
     {
+        //get book$book
+        $book = Book::findOrfail($id);
+
         /**
          * validate request
          */
         $validator = Validator::make($request->all(), [
-            'title' => 'required|unique:books', $book->id,
-            'synopsis' => 'required',
+            'title' => 'nullable|unique:books.title',
+            'synopsis' => 'nullable',
             'isbn' => 'nullable|string',
             'writer' => 'nullable|string',
             'page_amount' => 'nullable|integer',
             'stock_amount' => 'nullable|integer',
-            'published' => 'required',
+            'published' => 'nullable',
             'category' => 'nullable|string',
-            'image' => 'required|file|mimes:jpeg,jpg,png|max:2000',
+            'image' => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
         ]);
 
         if ($validator->fails()) {
