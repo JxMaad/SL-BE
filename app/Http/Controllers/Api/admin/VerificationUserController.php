@@ -38,7 +38,6 @@ class VerificationUserController extends Controller
             'password' => 'required|confirmed',
             'roles' => 'required',
             'nisn' => (in_array('anggota', $roles)) ? 'required|unique:members,nisn' : 'nullable',
-            'nip' => (in_array('pustakawan', $roles)) ? 'required|unique:librarian,nip' : 'nullable',
         ], [
             'name.required' => 'Nama wajib diisi.',
 
@@ -50,8 +49,6 @@ class VerificationUserController extends Controller
             'roles.required' => 'Peran wajib diisi.',
             'nisn.required' => 'NISN wajib diisi.',
             'nisn.unique' => 'NISN sudah terdaftar.',
-            'nip.required' => 'NIP wajib diisi.',
-            'nip.unique' => 'NIP sudah terdaftar.',
         ]);
 
         if ($validator->fails()) {
@@ -92,10 +89,10 @@ class VerificationUserController extends Controller
                 Member::create(['nisn' => $request->nisn]);
             }
 
-            // Simpan NIP yang dimasukkan oleh pengguna
-            if (in_array('pustakawan', $roles) && $request->nip) {
-                Librarian::create(['nip' => $request->nip]);
-            }
+            // // Simpan NIP yang dimasukkan oleh pengguna
+            // if (in_array('pustakawan', $roles) && $request->nip) {
+            //     Librarian::create(['nip' => $request->nip]);
+            // }
         }
 
         // Fetch random image from Lorem Picsum
@@ -135,15 +132,16 @@ class VerificationUserController extends Controller
                     // Handle if member identifier not found
                     return response()->json(['error' => 'Data NISN tidak ditemukan.'], 422);
                 }
-            } elseif (in_array('pustakawan', $roles)) {
-                $librarianUpdate = Librarian::where('nip', $request->nip)->first();
-                if ($librarianUpdate) {
-                    $librarianUpdate->update(['pustakawan_id' => $user->id]);
-                } else {
-                    // Handle if librarian identifier not found
-                    return response()->json(['error' => 'Data NIP tidak ditemukan.'], 422);
-                }
-            }
+            } 
+            // elseif (in_array('pustakawan', $roles)) {
+            //     $librarianUpdate = Librarian::where('nip', $request->nip)->first();
+            //     if ($librarianUpdate) {
+            //         $librarianUpdate->update(['pustakawan_id' => $user->id]);
+            //     } else {
+            //         // Handle if librarian identifier not found
+            //         return response()->json(['error' => 'Data NIP tidak ditemukan.'], 422);
+            //     }
+            // }
             // } else {
             //     // Admin sedang membuat akun, tambahkan NISN atau nip baru jika tidak ditemukan di database
             //     if (in_array('member', $roles) || in_array('pengurus_kelas', $roles)) {

@@ -31,63 +31,61 @@ class UserController extends Controller
         return new UserResource(true, 'List Data User', $users);
     }
 
-    // /**
-    //  * Store a newly created resource in storage.
-    //  * 
-    //  * @param \Illuminate\Http\Request $request
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function store(Request $request)
-    // {
-    //     /**
-    //      * Validate request
-    //      */
-    //     $validator = Validator::make($request->all(), [
-    //         'name'         => 'required',               
-    //         'email'        => 'required|unique:users',
-    //         'password'     => 'required|confirmed',
-    //         'roles'        => 'required',
-    //         'status'       => 'required'
-    //     ]);
+    /**
+     * Store a newly created resource in storage.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        /**
+         * Validate request
+         */
+        $validator = Validator::make($request->all(), [
+            'name'         => 'required',               
+            'email'        => 'required|unique:users',
+            'password'     => 'required|confirmed',
+            'roles'        => 'required',
+        ]);
 
-    //     if ($validator->fails()) {
-    //         return response()->json($validator->errors(), 422);
-    //     }
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
-    //     // Fetch random image from Lorem Picsum
-    //     $response = Http::get('https://picsum.photos/200/300');
+        // Fetch random image from Lorem Picsum
+        $response = Http::get('https://picsum.photos/200/300');
 
-    //     // Check if the request to Lorem Picsum was successful
-    //     if ($response->ok()) {
-    //         $imageContent = $response->body();
+        // Check if the request to Lorem Picsum was successful
+        if ($response->ok()) {
+            $imageContent = $response->body();
 
-    //         // Generate unique image name
-    //         $imageName = time() . '.jpg';
+            // Generate unique image name
+            $imageName = time() . '.jpg';
 
-    //         // Store image in the filesystem
-    //         Storage::disk('public')->put('users/' . $imageName, $imageContent);
+            // Store image in the filesystem
+            Storage::disk('public')->put('users/' . $imageName, $imageContent);
 
-    //         // Create user with image filename
-    //         $user = User::create([
-    //             'name'     => $request->name,
-    //             'email'    => $request->email,
-    //             'password' => bcrypt($request->password),
-    //             'image'    => $imageName, // Store only the filename in the database
-    //             'status'   => $request->status
-    //         ]);
+            // Create user with image filename
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => bcrypt($request->password),
+                'image'    => $imageName, // Store only the filename in the database
+            ]);
 
-    //         // Assign role to user
-    //         $user->assignRole($request->roles);
+            // Assign role to user
+            $user->assignRole($request->roles);
 
-    //         if ($user) {
-    //             // Return success with Api Resource
-    //             return new UserResource(true, 'Data User Berhasil Disimpan!', $user);
-    //         }
+            if ($user) {
+                // Return success with Api Resource
+                return new UserResource(true, 'Data User Berhasil Disimpan!', $user);
+            }
 
-    //         // Return failed with Api Resource
-    //         return new UserResource(false, 'Data User Gagal Disimpan!', null);
-    //     }
-    // }
+            // Return failed with Api Resource
+            return new UserResource(false, 'Data User Gagal Disimpan!', null);
+        }
+    }
 
     /**
      * Display the specified resource.

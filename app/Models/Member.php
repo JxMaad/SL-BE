@@ -11,16 +11,22 @@ class Member extends Model
 
     protected $fillable = [
         'nisn',
-        'anggota_id',
+        'name',
+        'gender', 
+        'birthplace', 
+        'date_of_birth', 
+        'phone',
+        'address',
+        'image',
     ];
 
-    /**
-     * member
-     * 
-     * @return void
-     */
-    public function member() 
-    {
-        return $this->belongsTo(Member::class, 'anggota_id');
-    }
+    // /**
+    //  * member
+    //  * 
+    //  * @return void
+    //  */
+    // public function member() 
+    // {
+    //     return $this->belongsTo(Member::class, 'anggota_id');
+    // }
 }

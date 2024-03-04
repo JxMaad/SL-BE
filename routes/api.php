@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Admin\BookController;
 use App\Http\Controllers\Api\Admin\BorrowController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\DashboardController;
+use App\Http\Controllers\Api\Admin\MemberController;
 use App\Http\Controllers\api\admin\RestoreController;
 use App\Http\Controllers\api\admin\ReturncheckController;
 use App\Http\Controllers\api\admin\VerificationUserController;
@@ -40,7 +41,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('/', [UserController::class, 'index'])->middleware(['permission:users.index', 'role:admin|pustakawan']);
         Route::get('/{id}', [UserController::class, 'show'])->middleware('permission:users.index');
-        // Route::post('/create', [UserController::class, 'store'])->middleware('permission:users.create');
+        Route::post('/create', [UserController::class, 'store'])->middleware('permission:users.create', 'role:admin|pustakawan');
         Route::put('/{id}/update', [UserController::class, 'update'])->middleware('permission:users.edit');
         Route::delete('/{id}', [UserController::class, 'destroy'])->middleware(['permission:users.delete', 'role:admin|pustakawan']);
         Route::put('/{id}/update-status', [UserController::class, 'updateStatusUser'])->middleware('permission:users.edit', 'role:admin|pustakawan');
@@ -56,7 +57,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::prefix('borrow')->group(function () {
-        Route::get('/', [BorrowController::class, 'index'])->middleware(['permission:borrows.index', 'role:admin|pustakawan']);
+        Route::get('/', [BorrowController::class, 'index'])->middleware(['permission:borrows.index']);
         Route::get('/{id}', [BorrowController::class, 'show'])->middleware('permission:borrows.index');
         Route::post('/create', [BorrowController::class, 'store'])->middleware(['permission:borrows.create', ]);
         Route::put('/{id}/update-status', [BorrowController::class, 'updateStatusBorrow'])->middleware('permission:borrows.edit', 'role:admin|pustakawan');
