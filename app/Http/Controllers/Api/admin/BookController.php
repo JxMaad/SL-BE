@@ -20,7 +20,7 @@ class BookController extends Controller
     public function index()
     {
         // Get all books regardless of the user
-        $books = Book::latest()->paginate(5);
+        $books = Book::latest()->paginate(8);
 
         // Append query string to pagination links
         $books->appends(['search' => request()->search]);

@@ -29,7 +29,7 @@ dpraer
 
 // Exclude login and register routes from auth:api middleware
 Route::post('/login', [App\Http\Controllers\Api\Auth\LoginController::class, 'index']);
-Route::post('/register', [VerificationUserController::class, 'store']);
+Route::post('/register', [UserController::class, 'store']);
 
 // Apply auth:api middleware to all routes
 Route::middleware('auth:api')->group(function () {

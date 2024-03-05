@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('book_views', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_id')->references('id')->on('books')->cascadeOnDelete();
+            // $table->foreignId('book_id')->references('id')->on('books')->cascadeOnDelete();
             $table->integer('views');
             $table->timestamps();
         });
