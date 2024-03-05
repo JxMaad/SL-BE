@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('librarians', function (Blueprint $table) {
             $table->id();
             $table->string('nip');
-            $table->foreignId('anggota_id')->nullable()->references('id')->on('users')->cascadeOnDelete();
+            // $table->foreignId('anggota_id')->nullable()->references('id')->on('users')->cascadeOnDelete();
             $table->timestamps();
         });
     }
