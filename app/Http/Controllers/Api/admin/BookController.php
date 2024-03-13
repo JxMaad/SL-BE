@@ -117,29 +117,29 @@ class BookController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * 
+     *
      * @param \Illuminate\Http\Request $request
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, book $book, $id)
+    public function update(Request $request, $id)
     {
-        //get book$book
-        $book = Book::findOrfail($id);
+        //get book
+        $book = Book::findOrFail($id);
 
         /**
          * validate request
          */
         $validator = Validator::make($request->all(), [
-            'title' => 'nullable|unique:books.title',
-            'synopsis' => 'nullable',
-            'isbn' => 'nullable|string',
-            'writer' => 'nullable|string',
-            'page_amount' => 'nullable|integer',
-            'stock_amount' => 'nullable|integer',
-            'published' => 'nullable',
-            'category' => 'nullable|string',
-            'image' => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
+            'title' => 'required|unique:books,title,' . $id,
+            'synopsis' => 'required',
+            'isbn' => 'required|string',
+            'writer' => 'required|string',
+            'page_amount' => 'required|integer',
+            'stock_amount' => 'required|integer',
+            'published' => 'required',
+            'category' => 'required|string',
+            'image' => 'required|file|mimes:jpeg,jpg,png|max:2000',
         ]);
 
         if ($validator->fails()) {
@@ -154,7 +154,7 @@ class BookController extends Controller
 
             //upload new image
             $image = $request->file('image');
-            $image->storeAs('public/books', $image->hashName());
+            $imagePath = $image->storeAs('public/books', $image->hashName());
 
             //update new image
             $book->update([
@@ -166,9 +166,9 @@ class BookController extends Controller
                 'stock_amount' => $request->input('stock_amount'),
                 'published' => $request->input('published'),
                 'category' => $request->input('category'),
-                'image' => $image->hashName(),
+                'image' => $imagePath,
             ]);
-
+        } else {
             //update no image
             $book->update([
                 'title' => $request->input('title'),
@@ -182,12 +182,13 @@ class BookController extends Controller
             ]);
         }
 
-        if ($book) {
-            //ruturn success with Api Resource
+        // check if the update was successful
+        if ($book->wasChanged()) {
+            // return success with Api Resource
             return new BookResource(true, 'Data book Berhasil Diupdate!', $book);
         }
 
-        //return failed with Api Resource
+        // return failed with Api Resource
         return new BookResource(false, 'Data book Gagal Diupdate!', null);
     }
 
