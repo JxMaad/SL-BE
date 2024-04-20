@@ -43,7 +43,7 @@ class UserController extends Controller
          * Validate request
          */
         $validator = Validator::make($request->all(), [
-            'name'         => 'required',               
+            'name'         => 'required',
             'email'        => 'required|unique:users',
             'password'     => 'required|confirmed',
             // 'roles'        => 'required',
@@ -194,15 +194,22 @@ class UserController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        //delete role 
+        $user = User::find($id);
+
+        if (!$user) {
+            // Jika user tidak ditemukan, kembalikan respons dengan Api Resource
+            return new UserResource(false, 'Data User Tidak Ditemukan!', null);
+        }
+
+        // Menghapus user
         if ($user->delete()) {
-            //return success with Api Resource
+            // Kembalikan respons berhasil dengan Api Resource
             return new UserResource(true, 'Data User Berhasil Dihapus!', null);
         }
 
-        //return failed with Api Resource
+        // Jika gagal menghapus, kembalikan respons gagal dengan Api Resource
         return new UserResource(false, 'Data User Gagal Dihapus!', null);
     }
 }

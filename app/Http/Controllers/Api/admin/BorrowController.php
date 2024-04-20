@@ -8,12 +8,15 @@ use App\Http\Resources\BorrowResource;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Support\Facades\Auth; // Tambahkan ini
+use App\Models\User;
 
 class BorrowController extends Controller
 {
     public function index()
     {
-        $borrows = Borrow::latest()->paginate(5);
+        // Ambil data peminjaman dengan relasi user dan book
+        $borrows = Borrow::with('user', 'book')->latest()->paginate(5);
+
         // Return with Api Resource
         return new BorrowResource(true, 'List Data borrows', $borrows);
     }
