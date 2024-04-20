@@ -20,13 +20,13 @@ class BookController extends Controller
     public function index()
     {
         // Get all books regardless of the user
-        $books = Book::latest()->paginate(8);
+        $books = Book::latest()->paginate(6);
 
-        // Append query string to pagination links
-        $books->appends(['search' => request()->search]);
+    // Calculate total books
+    $totalBuku = Book::count();
 
-        // Return with Api Resource
-        return new BookResource(true, 'List Data Buku', $books);
+    // Return with Api Resource
+    return new BookResource(true, 'List Data Buku', $books, $totalBuku);
     }
 
     /**
@@ -206,12 +206,12 @@ class BookController extends Controller
         // Pastikan buku ditemukan
         if ($book) {
             // Periksa apakah status buku saat ini adalah 'available'
-            if ($book->status === 'available') {
+            if ($book->status === 'tersedia') {
                 // Buat permohonan peminjaman baru
                 $borrow = new Borrow();
                 $borrow->borrowing_start = now();
                 $borrow->borrowing_end = now()->addDays(7); // Misalnya, peminjaman selama 7 hari
-                $borrow->status = 'pending'; // Permohonan peminjaman masih menunggu persetujuan admin
+                $borrow->status = 'tertunda'; // Permohonan peminjaman masih menunggu persetujuan admin
                 $borrow->book_id = $book->id;
                 $borrow->user_id = auth()->user()->id; // Anggap saja kita memiliki autentikasi user
 
