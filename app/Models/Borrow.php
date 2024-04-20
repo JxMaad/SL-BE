@@ -22,7 +22,7 @@ class Borrow extends Model
      * 
      * @return void
      */
-    public function book() 
+    public function book()
     {
         return $this->belongsTo(Book::class);
     }
@@ -32,7 +32,7 @@ class Borrow extends Model
      * 
      * @return void
      */
-    public function user() 
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
@@ -42,7 +42,7 @@ class Borrow extends Model
      * 
      * @return void
      */
-    public function restore() 
+    public function restore()
     {
         return $this->hasOne(Restore::class);
     }

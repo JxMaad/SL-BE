@@ -193,43 +193,31 @@ class BookController extends Controller
     }
 
     /**
-     * Memperbarui status buku menjadi 'loaned' setelah disetujui oleh admin.
+     * Mengupdate status buku menjadi dipinjam dengan persetujuan admin.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function updateStatusBook($id)
-    {
-        // Cari buku berdasarkan ID
-        $book = Book::find($id);
+    // public function updateStatusBook($id)
+    // {
+    //     // Temukan buku berdasarkan ID
+    //     $book= Book::find($id);
 
-        // Pastikan buku ditemukan
-        if ($book) {
-            // Periksa apakah status buku saat ini adalah 'available'
-            if ($book->status === 'available') {
-                // Buat permohonan peminjaman baru
-                $borrow = new Borrow();
-                $borrow->borrowing_start = now();
-                $borrow->borrowing_end = now()->addDays(7); // Misalnya, peminjaman selama 7 hari
-                $borrow->status = 'pending'; // Permohonan peminjaman masih menunggu persetujuan admin
-                $borrow->book_id = $book->id;
-                $borrow->user_id = auth()->user()->id; // Anggap saja kita memiliki autentikasi user
+    //     // Pastikan buku ditemukan
+    //     if ($book) {
+    //         // Periksa apakah status buku saat ini adalah 'available'
+    //         if ($book->status === 'available') {
+    //             // Update status buku menjadi 'pending'
+    //             $book->status = 'pending';
+    //             $book->save();
 
-                // Simpan permohonan peminjaman
-                $borrow->save();
-
-                // Update status buku menjadi 'loaned'
-                $book->status = 'loaned';
-                $book->save();
-
-                return response()->json(['message' => 'Status buku berhasil diperbarui menjadi diterima untuk dipinjam.']);
-            } else {
-                return response()->json(['message' => 'Buku tidak tersedia untuk dipinjam saat ini.'], 400);
-            }
-        } else {
-            return response()->json(['message' => 'Buku tidak ditemukan.'], 404);
-        }
-    }
+    //             return response()->json(['message' => 'status buku berhasil diperbarui.']);
+    //         } else {
+    //             // Jika buku tidak ditemukan, kembalikan respon error
+    //             return response()->json(['message' => 'status buku gagal diperbarui'], 404);
+    //         }
+    //     }
+    // }
 
     /**
      * Remove the specified resource from storage.

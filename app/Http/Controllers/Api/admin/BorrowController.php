@@ -78,29 +78,60 @@ class BorrowController extends Controller
     }
 
     /**
-     * Mengupdate status buku menjadi dipinjam dengan persetujuan admin.
+     * Memperbarui status buku menjadi 'loaned' setelah disetujui oleh admin.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function updateStatusBorrow($id)
     {
-        // Temukan buku berdasarkan ID
-        $borrow = Borrow::find($id);
+        // Mencari buku berdasarkan ID
+        $book = Book::find($id);
 
-        // Pastikan buku ditemukan
-        if ($borrow) {
-            // Periksa apakah status buku saat ini adalah 'pending'
-            if ($borrow->status === 'pending') {
-                // Update status buku menjadi 'accepted'
-                $borrow->status = 'accepted';
-                $borrow->save();
+        // Pastikan permohonan peminjaman ditemukan
+        if ($book) {
+            // Periksa apakah status permohonan peminjaman saat ini adalah 'available'
+            if ($book->status === 'available')
+            // Buat permohonan peminjaman baru
+            $borrow = new Borrow();
+            $borrow->borrowing_start = now();
+            $borrow->borrowing_end = now()->addDays(7); // Misalnya, peminjaman selama 7 hari
+            $borrow->status = 'pending'; // Permohonan peminjaman masih menunggu persetujuan admin
+            $borrow->book_id = $book->id;
+            $borrow->user_id = auth()->user()->id; // Anggap saja kita memiliki autentikasi user
 
-                return response()->json(['message' => 'Permohonan peminjaman buku berhasil diajukan.']);
-            } else {
-                // Jika buku tidak ditemukan, kembalikan respon error
-                return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
-            }
-        }
+            // Simpan permohonan peminjaman
+            $borrow->save();
+
+            // Update status buku menjadi 'loaned'
+            $book->status = 'loaned';
+            $book->save();
+
+            return response()->json(['message' => 'Permohonan peminjaman berhasil dibuat.']);
+        } 
+            return response()->json(['message' => 'Terjadi kesalahan saat memproses permohonan peminjaman.'], 500);
     }
+
+
+    // public function updateStatusBorrow($id)
+    // {
+    //     // Cari permohonan peminjaman berdasarkan ID
+    //     $borrow = Borrow::find($id);
+
+    //     // Pastikan permohonan peminjaman ditemukan
+    //     if ($borrow) {
+    //         // Periksa apakah status permohonan peminjaman saat ini adalah 'pending'
+    //         if ($borrow->status === 'pending') {
+    //             // Update status permohonan peminjaman
+    //             $borrow->status = 'loaned';
+    //             $borrow->save();
+
+    //             return response()->json(['message' => "Status permohonan peminjaman berhasil diperbarui."]);
+    //         } else {
+    //             return response()->json(['message' => 'Permohonan peminjaman tidak dalam status pending.'], 400);
+    //         }
+    //     } else {
+    //         return response()->json(['message' => 'Permohonan peminjaman tidak ditemukan.'], 404);
+    //     }
+    // }
 }

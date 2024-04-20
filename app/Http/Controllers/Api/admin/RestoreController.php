@@ -7,11 +7,26 @@ use App\Models\Borrow;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BorrowResource;
+use App\Http\Resources\RestoreResource;
 use App\Models\Book;
 use App\Models\Restore;
 
 class RestoreController extends Controller
 {
+    public function index()
+    {
+        //get user
+        $restore = Restore::when(request()->search, function ($restore) {
+            $restore = $restore->where('name', 'like', '%' . request()->search . '%');
+        })->with('roles')->latest()->paginate(5);
+
+        //append query string to pagination links
+        $restore->appends(['search' => request()->search]);
+
+        //return with Api Resource
+        return new RestoreResource(true, 'List Data User', $restore);
+    }
+
     public function show(Restore $restore, $id)
     {
         //get borrow
