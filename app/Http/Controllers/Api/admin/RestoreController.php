@@ -10,6 +10,7 @@ use App\Http\Resources\BorrowResource;
 use App\Http\Resources\RestoreResource;
 use App\Models\Book;
 use App\Models\Restore;
+use Illuminate\Support\Facades\Validator;
 
 class RestoreController extends Controller
 {
@@ -87,6 +88,64 @@ class RestoreController extends Controller
         } else {
             return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
         }
+    }
+
+    public function returnBookUser(Request $request, $id)
+    {
+
+        $borrow = Borrow::find($id);
+
+        $validator = Validator::make($request->all(), [
+            'returndate' => 'required',
+            'status' => 'required',
+            'book_id' => 'required',
+            'user_id' => 'required',
+            'borrow_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'salah input', 422]);
+        }
+
+        $borrow->update([
+            'returndate' => $request->input('returndate'),
+            'status' => $request->input('status'),
+            'book_id' => $request->input('book_id'),
+            'user_id' => $request->input('user_id'),
+            'borrow_id' => $request->input('borrow_id'),
+        ]);
+
+        if ($borrow->wasChanged()) {
+            // return success with Api Resource
+
+            // return new BorrowResource(true, 'Data kontol Berhasil Diupdate!', $borrow);
+            $returnBook = new Restore();
+            $returnBook->returndate = now();
+            $returnBook->status = 'pending'; // Pengembalian masih menunggu pengecekan admin
+            $returnBook->book_id = $borrow->book_id;
+            $returnBook->user_id = $borrow->user_id;
+            $returnBook->borrow_id = $borrow->id;
+
+            // Simpan data pengembalian buku
+            $returnBook->save();
+
+            // Update status buku menjadi 'returned'
+            $book = Book::find($borrow->book_id);
+            $book->status = 'returned';
+            $book->save();
+
+            // Ubah status peminjaman menjadi selesai
+            $borrow->status = 'completed';
+            $borrow->save();
+
+            // Ubah status pengembalian menjadi selesai dikembalikan
+            $returnBook->status = 'returned';
+            $returnBook->save();
+
+            return response()->json(['message' => 'Buku berhasil dikembalikan.']);
+        }
+
+        return new BorrowResource(false, 'data gagal coy', null);
     }
 
     // /**
