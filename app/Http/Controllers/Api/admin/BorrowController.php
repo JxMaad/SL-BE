@@ -98,6 +98,11 @@ class BorrowController extends Controller
                 $borrow->status = 'accepted';
                 $borrow->save();
 
+                // Update status buku menjadi 'returned'
+                $book = Book::find($borrow->book_id);
+                $book->status = 'sold out';
+                $book->save();
+
                 return response()->json(['message' => "Status permohonan peminjaman berhasil diperbarui."]);
             } else {
                 return response()->json(['message' => 'Permohonan peminjaman tidak dalam status pending.'], 400);

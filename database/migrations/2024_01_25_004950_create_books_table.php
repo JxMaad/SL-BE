@@ -22,7 +22,7 @@ return new class extends Migration
             $table->year('published');
             $table->string('category')->nullable();
             $table->string('image');
-            $table->enum('status', ['available', 'loaned', 'returned'])->default('available');
+            $table->enum('status', ['available','returned','sold out'])->default('available');
             $table->timestamps();
         });
     }

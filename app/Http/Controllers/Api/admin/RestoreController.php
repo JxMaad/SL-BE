@@ -69,11 +69,6 @@ class RestoreController extends Controller
                 // Simpan data pengembalian buku
                 $returnBook->save();
 
-                // Update status buku menjadi 'returned'
-                $book = Book::find($borrow->book_id);
-                $book->status = 'returned';
-                $book->save();
-
                 // Ubah status peminjaman menjadi selesai
                 $borrow->status = 'completed';
                 $borrow->save();

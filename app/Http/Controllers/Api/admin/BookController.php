@@ -186,33 +186,6 @@ class BookController extends Controller
     }
 
     /**
-     * Mengupdate status buku menjadi dipinjam dengan persetujuan admin.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    // public function updateStatusBook($id)
-    // {
-    //     // Temukan buku berdasarkan ID
-    //     $book= Book::find($id);
-
-    //     // Pastikan buku ditemukan
-    //     if ($book) {
-    //         // Periksa apakah status buku saat ini adalah 'available'
-    //         if ($book->status === 'available') {
-    //             // Update status buku menjadi 'pending'
-    //             $book->status = 'pending';
-    //             $book->save();
-
-    //             return response()->json(['message' => 'status buku berhasil diperbarui.']);
-    //         } else {
-    //             // Jika buku tidak ditemukan, kembalikan respon error
-    //             return response()->json(['message' => 'status buku gagal diperbarui'], 404);
-    //         }
-    //     }
-    // }
-
-    /**
      * Remove the specified resource from storage.
      * 
      * @param int $id
@@ -249,4 +222,31 @@ class BookController extends Controller
     //         'click_action'  => 'OPEN_ACTIVITY'
     //     ])
     //     ->send();
+
+    /**
+     * Mengupdate status buku menjadi dipinjam dengan persetujuan admin.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    // public function updateStatusBook($id)
+    // {
+    //     // Temukan buku berdasarkan ID
+    //     $book= Book::find($id);
+
+    //     // Pastikan buku ditemukan
+    //     if ($book) {
+    //         // Periksa apakah status buku saat ini adalah 'available'
+    //         if ($book->status === 'available') {
+    //             // Update status buku menjadi 'pending'
+    //             $book->status = 'pending';
+    //             $book->save();
+
+    //             return response()->json(['message' => 'status buku berhasil diperbarui.']);
+    //         } else {
+    //             // Jika buku tidak ditemukan, kembalikan respon error
+    //             return response()->json(['message' => 'status buku gagal diperbarui'], 404);
+    //         }
+    //     }
+    // }
 }
