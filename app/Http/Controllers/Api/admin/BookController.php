@@ -59,10 +59,15 @@ class BookController extends Controller
 
         //upload image
         $image = $request->file('image');
-        $image->storeAs('public/books', $image->hashName());
+        $imagePath = $image->storeAs('public/books', $image->hashName());
+
+        // Pastikan image berhasil di-upload
+        if (!$imagePath) {
+            return new BookResource(false, 'Gagal mengunggah gambar!', null);
+        }
 
         //create book
-        $book = book::create([
+        $book = Book::create([
             'title' => $request->input('title'),
             'synopsis' => $request->input('synopsis'),
             'isbn' => $request->input('isbn'),
@@ -71,20 +76,8 @@ class BookController extends Controller
             'stock_amount' => $request->input('stock_amount'),
             'published' => $request->input('published'),
             'category' => $request->input('category'),
-            'image' => $image->hashName(),
+            'image' => $imagePath, // Menggunakan path yang disimpan
         ]);
-
-        // //push notifications firebase
-        // fcm()
-        //     ->toTopic('push-notifications')
-        //     ->priority('normal')
-        //     ->timeToLive(0)
-        //     ->notification([
-        //         'titel'         => 'Berita Baru !',
-        //         'body'          => 'Disini akan menampilkan judul berita baru',
-        //         'click_action'  => 'OPEN_ACTIVITY'
-        //     ])
-        //     ->send();
 
         if ($book) {
             //return success with Api Resource
@@ -150,7 +143,7 @@ class BookController extends Controller
         if ($request->file('image')) {
 
             //remove old image
-            Storage::disk('local')->delete('public/books/' . basename($book->image));
+            Storage::disk('local')->delete('public/books' . basename($book->image));
 
             //upload new image
             $image = $request->file('image');
@@ -244,4 +237,16 @@ class BookController extends Controller
         // Mengembalikan respons gagal jika buku tidak ditemukan atau gagal dihapus
         return new BookResource(false, 'Data buku gagal dihapus!', null);
     }
+
+    // //push notifications firebase
+    // fcm()
+    //     ->toTopic('push-notifications')
+    //     ->priority('normal')
+    //     ->timeToLive(0)
+    //     ->notification([
+    //         'titel'         => 'Berita Baru !',
+    //         'body'          => 'Disini akan menampilkan judul berita baru',
+    //         'click_action'  => 'OPEN_ACTIVITY'
+    //     ])
+    //     ->send();
 }

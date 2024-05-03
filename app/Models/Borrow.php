@@ -12,6 +12,7 @@ class Borrow extends Model
     protected $fillable = [
         'borrowing_start',
         'borrowing_end',
+        'amount_borrowed',
         'status',
         'book_id',
         'user_id',

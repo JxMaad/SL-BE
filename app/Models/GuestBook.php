@@ -5,11 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class BookView extends Model
+class GuestBook extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'book_id', 'views'
+        'name',
+        'class',
+        'departemen',
+        'email',
+        'address',
+        'goals',
+        'telp',
     ];
 }

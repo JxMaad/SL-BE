@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->dateTime('borrowing_start');
             $table->dateTime('borrowing_end');
+            $table->integer('amount_borrowed');
             $table->enum('status', ['pending', 'accepted', 'completed'])->default('pending');
             $table->foreignId('book_id')->constrained('books')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();

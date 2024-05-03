@@ -5,9 +5,8 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class GuestBookResource extends JsonResource
 {
-
     public $status;
     public $message;
 
@@ -19,24 +18,25 @@ class CategoryResource extends JsonResource
      * @param mixed $resource
      * @return void
      */
-    public function __construct($status,$message,$resource)
+    public function __construct($status, $message, $resource)
     {
         parent::__construct($resource);
         $this->status   = $status;
-        $this->message  = $message;
+        $this->message  = $message;   
     }
 
     /**
      * Transform the resource into an array.
      *
-     * @return array<string, mixed>
+     * @param \Illuminate\Http\Request $request
+     * @return array
      */
     public function toArray($request)
     {
         return [
-            'success'   => $this->status,
-            'message'   => $this->message,
-            'data'      => $this->resource
+            'success'    => $this->status,
+            'message'    => $this->message,
+            'data'       => $this->resource
         ];
     }
 }

@@ -22,7 +22,7 @@ class UserController extends Controller
         //get user
         $users = User::when(request()->search, function ($users) {
             $users = $users->where('name', 'like', '%' . request()->search . '%');
-        })->with('roles')->latest()->paginate(5);
+        })->with('roles')->latest()->paginate(10);
 
         //append query string to pagination links
         $users->appends(['search' => request()->search]);
@@ -53,38 +53,23 @@ class UserController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // Fetch random image from Lorem Picsum
-        $response = Http::get('https://picsum.photos/200/300');
+        // Create user
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => bcrypt($request->password),
+        ]);
 
-        // Check if the request to Lorem Picsum was successful
-        if ($response->ok()) {
-            $imageContent = $response->body();
+        // Assign role to user
+        $user->assignRole($request->roles);
 
-            // Generate unique image name
-            $imageName = time() . '.jpg';
-
-            // Store image in the filesystem
-            Storage::disk('public')->put('users/' . $imageName, $imageContent);
-
-            // Create user with image filename
-            $user = User::create([
-                'name'     => $request->name,
-                'email'    => $request->email,
-                'password' => bcrypt($request->password),
-                'image'    => $imageName, // Store only the filename in the database
-            ]);
-
-            // Assign role to user
-            $user->assignRole($request->roles);
-
-            if ($user) {
-                // Return success with Api Resource
-                return new UserResource(true, 'Data User Berhasil Disimpan!', $user);
-            }
-
-            // Return failed with Api Resource
-            return new UserResource(false, 'Data User Gagal Disimpan!', null);
+        if ($user) {
+            // Return success with Api Resource
+            return new UserResource(true, 'Data User Berhasil Disimpan!', $user);
         }
+
+        // Return failed with Api Resource
+        return new UserResource(false, 'Data User Gagal Disimpan!', null);
     }
 
     /**
@@ -116,10 +101,9 @@ class UserController extends Controller
          * Validate request
          */
         $validator = Validator::make($request->all(), [
-            'name'           => 'required',
-            'email'          => 'required',
+            'name'           => 'sometimes',
+            'email'          => 'sometimes',
             'password'       => 'sometimes|confirmed',
-            'image'          => 'nullable|file|mimes:jpeg,jpg,png|max:2000',
         ]);
 
         if ($validator->fails()) {
@@ -127,27 +111,22 @@ class UserController extends Controller
         }
 
         // Mengupdate data user lainnya
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
+        if ($request->filled('name')) {
+            $user->update([
+                'name' => $request->name,
+            ]);
+        }
+
+        if ($request->filled('email')) {
+            $user->update([
+                'email' => $request->email,
+            ]);
+        }
 
         // Mengupdate password jika dimasukkan
         if ($request->filled('password')) {
             $user->update([
                 'password' => bcrypt($request->password),
-            ]);
-        }
-
-        // Mengupdate gambar jika dimasukkan
-        if ($request->hasFile('image')) {
-            // Menghapus gambar lama jika ada
-            Storage::delete($user->image);
-
-            // Mengunggah gambar baru
-            $imagePath = $request->file('image')->store('images', 'public');
-            $user->update([
-                'image' => $imagePath,
             ]);
         }
 
@@ -163,6 +142,7 @@ class UserController extends Controller
             return new UserResource(false, 'Data User Gagal Diupdate!', null);
         }
     }
+
 
     /**
      * Mengupdate status user dari loading menjadi active.

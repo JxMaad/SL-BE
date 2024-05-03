@@ -75,6 +75,11 @@ class PermissionsTableSeeder extends Seeder
         Permission::create(['name' => 'users.edit', 'guard_name' => 'api']);
         Permission::create(['name' => 'users.delete', 'guard_name' => 'api']);
 
+        Permission::create(['name' => 'guest.index', 'guard_name' => 'api']);
+        Permission::create(['name' => 'guest.create', 'guard_name' => 'api']);
+        Permission::create(['name' => 'guest.edit', 'guard_name' => 'api']);
+        Permission::create(['name' => 'guest.delete', 'guard_name' => 'api']);
+
         // Assign permissions to roles
         $roles = Role::all();
 
