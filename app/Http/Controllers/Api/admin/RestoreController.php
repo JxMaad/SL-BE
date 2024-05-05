@@ -45,8 +45,10 @@ class RestoreController extends Controller
 
     public function returnBookUser(Request $request, $id)
     {
+        // Temukan peminjaman berdasarkan ID
         $borrow = Borrow::find($id);
 
+        // Validasi input
         $validator = Validator::make($request->all(), [
             'returndate' => 'required',
             'book_id' => 'required',
@@ -55,10 +57,12 @@ class RestoreController extends Controller
             'status' => 'required',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['message' => 'gagal input bro', 422]);
+        // Jika validasi gagal
+        if ($validator->fails() || !$borrow) {
+            return response()->json(['message' => 'Gagal input bro'], 422);
         }
 
+        // Update peminjaman dengan data pengembalian yang baru
         $borrow->update([
             'returndate' => $request->input('returndate'),
             'book_id' => $request->input('book_id'),
@@ -67,35 +71,48 @@ class RestoreController extends Controller
             'status' => $request->input('status'),
         ]);
 
-        if ($borrow->wasChanged()) {
-            // return success with Api Resource
+        // Simpan data pengembalian buku
+        $returnBook = new Restore();
+        $returnBook->returndate = $request->input('returndate');
+        $returnBook->book_id = $borrow->book_id;
+        $returnBook->user_id = $borrow->user_id;
+        $returnBook->borrow_id = $borrow->id;
+        $returnBook->status = 'pending'; // Pengembalian masih menunggu pengecekan admin
+        $returnBook->save();
 
-            // return new BorrowResource(true, 'Data kontol Berhasil Diupdate!', $borrow);
-            $returnBook = new Restore();
-            $returnBook->returndate = $request->input('returndate');
-            $returnBook->book_id = $borrow->book_id;
-            $returnBook->user_id = $borrow->user_id;
-            $returnBook->borrow_id = $borrow->id;
-            $returnBook->status = 'pending'; // Pengembalian masih menunggu pengecekan admin
+        // Ubah status pengembalian menjadi selesai dikembalikan
+        $returnBook->status = 'returned';
+        $returnBook->save();
+        
+        // Ubah status peminjaman menjadi selesai
+        $borrow->status = 'completed';
+        $borrow->save();
 
-            // Simpan data pengembalian buku
-            $returnBook->save();
+        // Hitung denda jika ada
+        $this->returnCheckFine($returnBook->id);
 
-            // Ubah status peminjaman menjadi selesai
-            $borrow->status = 'completed';
-            $borrow->save();
+        // Ambil data buku yang dipinjam
+        $borrowedBook = Book::find($borrow->book_id);
+        if ($borrowedBook) {
+            // Simpan jumlah buku yang dipinjam sebelum mengurangi stok
+            $borrowedAmount = $borrowedBook->stock_amount;
 
-            // Ubah status pengembalian menjadi selesai dikembalikan
-            $returnBook->status = 'returned';
-            $returnBook->save();
+            // Update stok buku yang dikembalikan agar sama dengan stok yang dipinjam
+            $returnedBook = Book::find($borrow->book_id);
+            if ($returnedBook) {
+                $returnedBook->stock_amount += $borrowedAmount; // Tambahkan stok yang dipinjam
+                // Jika stok buku sebelumnya habis dan sekarang menjadi tersedia, ubah statusnya menjadi "available"
+                if ($returnedBook->stock_amount > 0 && $returnedBook->status != 'available') {
+                    // $returnedBook->status = 'available';
+                    $returnedBook->save();
+                }
 
-            // Hitung denda jika ada
-            $this->returnCheckFine($returnBook->id);
+                return response()->json(['message' => 'Buku berhasil dikembalikan.']);
+            }
 
-            return response()->json(['message' => 'Buku berhasil dikembalikan.']);
+            // Jika buku tidak ditemukan
+            return response()->json(['message' => 'Buku tidak ditemukan.'], 404);
         }
-
-        return new BorrowResource(false, 'Buku gagal dikembalikan', null);
     }
 
     public function returnCheckFine($id)
