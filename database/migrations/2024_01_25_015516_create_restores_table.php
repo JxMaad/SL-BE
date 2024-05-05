@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('restores', function (Blueprint $table) {
             $table->id();
             $table->dateTime('returndate');
-            $table->enum('status', ['pending', 'accepted', 'returned', 'overdue'])->default('pending');
             $table->float('fine')->nullable();
             $table->foreignId('book_id')->references('id')->on('books')->cascadeOnDelete();
             $table->foreignId('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreignId('borrow_id')->references('id')->on('borrows')->cascadeOnDelete();
+            $table->enum('status', ['pending', 'accepted', 'returned', 'overdue'])->default('pending');
             $table->timestamps();
         });
     }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Models\Role;
 
 class Restore extends Model
 {
@@ -11,11 +12,11 @@ class Restore extends Model
 
     protected $fillable = [
         'returndate',
-        'status',
         'fine',
         'book_id',
         'user_id',
         'borrow_id',
+        'status',
     ];
 
     /**
@@ -23,9 +24,9 @@ class Restore extends Model
      * 
      * @return void
      */
-    public function book() 
+    public function book()
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Book::class, 'book_id');
     }
 
     /**
@@ -33,9 +34,9 @@ class Restore extends Model
      * 
      * @return void
      */
-    public function user() 
+    public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -43,8 +44,8 @@ class Restore extends Model
      * 
      * @return void
      */
-    public function borrow() 
+    public function borrow()
     {
-        return $this->belongsTo(Borrow::class);
+        return $this->belongsTo(Borrow::class, 'borrow_id');
     }
 }

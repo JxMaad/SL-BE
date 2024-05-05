@@ -17,30 +17,30 @@ class RestoreController extends Controller
 {
     public function index()
     {
-        //get user
+        //get restore
         $restore = Restore::when(request()->search, function ($restore) {
             $restore = $restore->where('name', 'like', '%' . request()->search . '%');
-        })->with('roles')->latest()->paginate(5);
+        })->latest()->paginate(5);
 
         //append query string to pagination links
         $restore->appends(['search' => request()->search]);
 
         //return with Api Resource
-        return new RestoreResource(true, 'List Data User', $restore);
+        return new RestoreResource(true, 'List Data Pengembalian', $restore);
     }
 
     public function show(Restore $restore, $id)
     {
-        //get borrow
+        //get restore
         $restore = Restore::whereId($id)->first();
 
         if ($restore) {
             //return success with Api resource
-            return new BorrowResource(true, 'Detail Data borrow', $restore);
+            return new RestoreResource(true, 'Detail Data Pengembalian', $restore);
         }
 
         //return failed with Api Resource
-        return new BorrowResource(false, 'Detail Data borrow Tidak Ditemukan!', null);
+        return new RestoreResource(false, 'Detail Data Pengembalian Tidak Ditemukan!', null);
     }
 
     /**
