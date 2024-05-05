@@ -16,7 +16,7 @@ class BorrowController extends Controller
     public function index()
     {
         // Ambil data peminjaman dengan relasi user dan book
-        $borrows = Borrow::with('user', 'book')->latest()->paginate(5);
+        $borrows = Borrow::with('user', 'book')->latest()->paginate(10);
 
         // Return with Api Resource
         return new BorrowResource(true, 'List Data borrows', $borrows);

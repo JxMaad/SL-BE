@@ -68,7 +68,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('restore')->group(function () {
         Route::get('/', [RestoreController::class, 'index'])->middleware('permission:restores');
-        Route::get('/{id}/update-status', [RestoreController::class, 'returnBook'])->middleware(['permission:restores']);
         Route::get('/{id}/check-fine', [RestoreController::class, 'returnCheckFine'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::get('/{id}', [RestoreController::class, 'show'])->middleware('permission:restores');
         Route::post('/{id}',[RestoreController::class, 'returnBookUser'])->middleware('permission:restores', 'role:admin|pustakawan');

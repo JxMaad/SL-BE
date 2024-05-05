@@ -20,7 +20,7 @@ class RestoreController extends Controller
         //get restore
         $restore = Restore::when(request()->search, function ($restore) {
             $restore = $restore->where('name', 'like', '%' . request()->search . '%');
-        })->latest()->paginate(5);
+        })->latest()->paginate(10);
 
         //append query string to pagination links
         $restore->appends(['search' => request()->search]);
@@ -43,52 +43,8 @@ class RestoreController extends Controller
         return new RestoreResource(false, 'Detail Data Pengembalian Tidak Ditemukan!', null);
     }
 
-    /**
-     * Memproses pengembalian buku.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function returnBook($id)
-    {
-        // Cari peminjaman berdasarkan ID
-        $borrow = Borrow::find($id);
-
-        // Pastikan peminjaman ditemukan
-        if ($borrow) {
-            // Periksa apakah status peminjaman saat ini adalah 'pending' atau 'accepted'
-            if ($borrow->status === 'accepted') {
-                // Buat data pengembalian buku
-                $returnBook = new Restore();
-                $returnBook->returndate = now();
-                $returnBook->book_id = $borrow->book_id;
-                $returnBook->user_id = $borrow->user_id;
-                $returnBook->borrow_id = $borrow->id;
-                $returnBook->status = 'pending'; // Pengembalian masih menunggu pengecekan admin
-
-                // Simpan data pengembalian buku
-                $returnBook->save();
-
-                // Ubah status peminjaman menjadi selesai
-                $borrow->status = 'completed';
-                $borrow->save();
-
-                // Ubah status pengembalian menjadi selesai dikembalikan
-                $returnBook->status = 'returned';
-                $returnBook->save();
-
-                return response()->json(['message' => 'Buku berhasil dikembalikan.']);
-            } else {
-                return response()->json(['message' => 'Buku tidak dalam status dipinjam.'], 400);
-            }
-        } else {
-            return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
-        }
-    }
-
     public function returnBookUser(Request $request, $id)
     {
-
         $borrow = Borrow::find($id);
 
         $validator = Validator::make($request->all(), [
