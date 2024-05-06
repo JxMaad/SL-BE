@@ -17,15 +17,10 @@ class RestoreController extends Controller
 {
     public function index()
     {
-        //get restore
-        $restore = Restore::when(request()->search, function ($restore) {
-            $restore = $restore->where('name', 'like', '%' . request()->search . '%');
-        })->latest()->paginate(10);
+        // Ambil data peminjaman dengan relasi user dan book
+        $restore = Restore::with('user', 'borrow')->latest()->paginate(10);
 
-        //append query string to pagination links
-        $restore->appends(['search' => request()->search]);
-
-        //return with Api Resource
+        // Return with Api Resource
         return new RestoreResource(true, 'List Data Pengembalian', $restore);
     }
 
