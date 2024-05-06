@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use App\Models\Borrow;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\BorrowResource;
 use App\Http\Resources\RestoreResource;
 use App\Models\Book;
 use App\Models\Restore;
@@ -18,7 +17,7 @@ class RestoreController extends Controller
     public function index()
     {
         // Ambil data peminjaman dengan relasi user dan book
-        $restore = Restore::with('user', 'borrow')->latest()->paginate(10);
+        $restore = Restore::with('user', 'book', 'borrow')->latest()->paginate(10);
 
         // Return with Api Resource
         return new RestoreResource(true, 'List Data Pengembalian', $restore);
