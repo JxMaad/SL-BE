@@ -18,6 +18,7 @@ class Book extends Model
         'page_amount',
         'stock_amount',
         'published',
+        'publisher',
         'category',
         'image',
         'status',

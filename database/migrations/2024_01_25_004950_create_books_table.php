@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('books', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 20);
+            $table->string('title');
             $table->text('synopsis')->nullable();
-            $table->string('isbn', 30);
-            $table->string('writer', 50);
+            $table->string('isbn');
+            $table->string('writer');
             $table->integer('page_amount');
             $table->integer('stock_amount');
             $table->year('published');
-            $table->string('category')->nullable();
+            $table->string('publisher');
+            $table->enum('category', ['Buku Fiksi','Buku Pengetahuan (Non paket)','Kamus','Ensiklopedia','Al-Quran tafsir'])->nullable();
             $table->string('image');
             $table->enum('status', ['available','returned','sold out'])->default('available');
             $table->timestamps();

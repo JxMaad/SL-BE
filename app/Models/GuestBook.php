@@ -14,7 +14,6 @@ class GuestBook extends Model
         'class',
         'departemen',
         'email',
-        'address',
         'goals',
         'telp',
     ];

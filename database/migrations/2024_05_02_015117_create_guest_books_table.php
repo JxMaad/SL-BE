@@ -17,8 +17,7 @@ return new class extends Migration
             $table->string('class');
             $table->string('departemen');
             $table->string('email');
-            $table->text('address');
-            $table->string('goals');
+            $table->enum('goals', ['Meminjam','Mengerjakan tugas','Diskusi'])->nullable();
             $table->string('telp');
             $table->timestamps();
         });

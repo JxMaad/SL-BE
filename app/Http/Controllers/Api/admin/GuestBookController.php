@@ -31,8 +31,7 @@ class GuestBookController extends Controller
             'class' => 'required',
             'departemen' => 'required',
             'email' => 'required',
-            'address'   => 'required',
-            'goals' => 'required',
+            'goals' => 'required|enum',
             'telp'  => 'required',
         ]);
 
@@ -45,8 +44,7 @@ class GuestBookController extends Controller
             'class' => $request->input('class'),
             'departemen' => $request->input('departemen'),
             'email' => $request->input('email'),
-            'address' => $request->input('address'),
-            'goals' => $request->input('goals'),
+            'goals' => $request->goals,
             'telp' => $request->input('telp'),
         ]);
 
@@ -68,8 +66,7 @@ class GuestBookController extends Controller
             'class' => 'required',
             'departemen' => 'required',
             'email' => 'required',
-            'address'   => 'required',
-            'goals' => 'required',
+            'goals' => 'required|enum',
             'telp'  => 'required',
         ]);
 
@@ -82,8 +79,7 @@ class GuestBookController extends Controller
             'class' => $request->input('class'),
             'departemen' => $request->input('departemen'),
             'email' => $request->input('email'),
-            'address' => $request->input('address'),
-            'goals' => $request->input('goals'),
+            'goals' => $request->goals,
             'telp' => $request->input('telp'),
         ]);
 

@@ -48,7 +48,8 @@ class BookController extends Controller
             'page_amount' => 'nullable|integer',
             'stock_amount' => 'nullable|integer',
             'published' => 'required',
-            'category' => 'nullable|string',
+            'publisher' => 'required',
+            'category' => 'nullable|enum',
             'image' => 'required|file|mimes:jpeg,jpg,png|max:2000',
 
         ]);
@@ -75,7 +76,8 @@ class BookController extends Controller
             'page_amount' => $request->input('page_amount'),
             'stock_amount' => $request->input('stock_amount'),
             'published' => $request->input('published'),
-            'category' => $request->input('category'),
+            'publisher' => $request->input('publisher'),
+            'category' => $request->category,
             'image' => $imagePath, // Menggunakan path yang disimpan
         ]);
 
@@ -131,7 +133,8 @@ class BookController extends Controller
             'page_amount' => 'required|integer',
             'stock_amount' => 'required|integer',
             'published' => 'required',
-            'category' => 'required|string',
+            'publisher' => 'required',
+            'category' => 'required|enum',
             'image' => 'required|file|mimes:jpeg,jpg,png|max:2000',
         ]);
 
@@ -158,7 +161,8 @@ class BookController extends Controller
                 'page_amount' => $request->input('page_amount'),
                 'stock_amount' => $request->input('stock_amount'),
                 'published' => $request->input('published'),
-                'category' => $request->input('category'),
+                'publisher' => $request->input('publisher'),
+                'category' => $request->category,
                 'image' => $imagePath,
             ]);
         } else {
@@ -171,7 +175,8 @@ class BookController extends Controller
                 'page_amount' => $request->input('page_amount'),
                 'stock_amount' => $request->input('stock_amount'),
                 'published' => $request->input('published'),
-                'category' => $request->input('category'),
+                'publisher' => $request->input('publisher'),
+                'category' => $request->category,
             ]);
         }
 
