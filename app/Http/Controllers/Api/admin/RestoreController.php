@@ -74,14 +74,6 @@ class RestoreController extends Controller
         $returnBook->status = 'Menunggu'; // Pengembalian masih menunggu pengecekan admin
         $returnBook->save();
 
-        // Ubah status pengembalian menjadi selesai dikembalikan
-        $returnBook->status = 'Dikembalikan';
-        $returnBook->save();
-        
-        // Ubah status peminjaman menjadi selesai
-        $borrow->status = 'Selesai';
-        $borrow->save();
-
         // Hitung denda jika ada
         $this->returnCheckFine($returnBook->id);
 
@@ -92,6 +84,38 @@ class RestoreController extends Controller
 
         //return failed with Api Resource
         return new RestoreResource(false, 'Gagal dikembalikan', null);
+    }
+
+    public function updateStatusReturn($id)
+    {
+        // Cari permohonan pengembalian berdasarkan ID
+        $returnBook = Restore::find($id);
+
+        // Pastikan permohonan pengembalian ditemukan
+        if ($returnBook) {
+            // Periksa apakah status permohonan pengembalian saat ini adalah 'Menunggu'
+            if ($returnBook->status === 'Menunggu') {
+                // Ubah status pengembalian menjadi 'Dikembalikan'
+                $returnBook->status = 'Dikembalikan';
+                $returnBook->save();
+
+                // Cari permohonan peminjaman terkait menggunakan book_id
+                $borrow = Borrow::where('book_id', $returnBook->book_id)->first();
+
+                // Pastikan permohonan peminjaman ditemukan
+                if ($borrow) {
+                    // Ubah status peminjaman menjadi 'Selesai'
+                    $borrow->status = 'Selesai';
+                    $borrow->save();
+                }
+
+                return response()->json(['message' => "Status pengembalian berhasil diperbarui."]);
+            } else {
+                return response()->json(['message' => 'Permohonan pengembalian tidak dalam status menunggu.'], 400);
+            }
+        } else {
+            return response()->json(['message' => 'Permohonan pengembalian tidak ditemukan.'], 404);
+        }
     }
 
     public function returnCheckFine($id)

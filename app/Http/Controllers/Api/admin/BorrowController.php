@@ -8,7 +8,6 @@ use App\Http\Resources\BorrowResource;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Support\Facades\Auth; // Tambahkan ini
-use App\Models\User;
 use Dompdf\Dompdf;
 
 class BorrowController extends Controller
@@ -30,7 +29,6 @@ class BorrowController extends Controller
         // Validasi request
         $request->validate([
             'book_id' => 'required|exists:books,id',
-            
         ], [
             'book_id.required' => 'ID buku diperlukan.',
             'book_id.exists' => 'Buku tidak ditemukan.',
@@ -40,17 +38,19 @@ class BorrowController extends Controller
         $book = Book::findOrFail($request->book_id);
 
         // Periksa stok buku
-        if ($book->stock_amount < $request->amount_borrowed) {
+        if ($book->stock_amount <= 0) {
             return response()->json(['error' => 'Maaf, stok buku tidak mencukupi'], 400);
         }
 
         // Create borrow jika buku tersedia
         $borrow = Borrow::create([
-            'book_id' => $request->input('book_id'),
+            'book_id' => $request->book_id, // Gunakan ID buku dari request
             'user_id' => $userId, // Gunakan ID pengguna dari pengguna yang sedang login
         ]);
 
         if ($borrow) {
+            $book->stock_amount -= 1;
+            $book->save();
 
             // Return success with API Resource
             return new BorrowResource(true, 'Data peminjaman berhasil disimpan!', $borrow);
@@ -59,6 +59,7 @@ class BorrowController extends Controller
         // Return failed with API Resource
         return new BorrowResource(false, 'Data peminjaman gagal disimpan!', null);
     }
+
 
     public function show(Borrow $borrow, $id)
     {

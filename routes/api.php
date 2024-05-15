@@ -76,6 +76,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}',[RestoreController::class, 'returnBookUser'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::post('/generateRestorePdf', [RestoreController::class, 'generateRestorePdf'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::delete('/{id}', [RestoreController::class, 'destroy'])->middleware(['permission:restores', 'role:admin|pustakawan']);
+        Route::put('/{id}/update-status', [RestoreController::class, 'updateStatusReturn'])->middleware(['permission:restores', 'role:admin|pustakawan']);
     });
 
     Route::prefix('guestbook')->group(function () {
