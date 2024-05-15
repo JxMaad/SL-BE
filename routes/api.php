@@ -47,6 +47,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}/update', [UserController::class, 'update'])->middleware(['permission:users.edit']);
         Route::delete('/{id}', [UserController::class, 'destroy'])->middleware(['permission:users.delete', 'role:admin|pustakawan']);
         Route::put('/{id}/update-status', [UserController::class, 'updateStatusUser'])->middleware('permission:users.edit', 'role:admin|pustakawan');
+        Route::get('/export-user', [UserController::class, 'export'])->middleware(['role:admin|pustakawan']);
+        Route::post('/import-user', [UserController::class, 'import'])->middleware(['role:admin|pustakawan']);
     });
 
     Route::prefix('book')->group(function () {
@@ -64,6 +66,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/create', [BorrowController::class, 'store'])->middleware(['permission:borrows.create', ]);
         Route::put('/{id}/update-status', [BorrowController::class, 'updateStatusBorrow'])->middleware(['permission:borrows.edit', 'role:admin|pustakawan']);
         Route::post('/generateBorrowPdf', [BorrowController::class, 'generateBorrow'])->middleware(['permission:borrows.index', 'role:admin|pustakawan']);
+        Route::delete('/{id}', [BorrowController::class, 'destroy'])->middleware(['permission:borrows.delete', 'role:admin|pustakawan']);
     });
 
     Route::prefix('restore')->group(function () {
@@ -72,6 +75,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/{id}', [RestoreController::class, 'show'])->middleware(['permission:restores']);
         Route::post('/{id}',[RestoreController::class, 'returnBookUser'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::post('/generateRestorePdf', [RestoreController::class, 'generateRestorePdf'])->middleware(['permission:restores', 'role:admin|pustakawan']);
+        Route::delete('/{id}', [RestoreController::class, 'destroy'])->middleware(['permission:restores', 'role:admin|pustakawan']);
     });
 
     Route::prefix('guestbook')->group(function () {

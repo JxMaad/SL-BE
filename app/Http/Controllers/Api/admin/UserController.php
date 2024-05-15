@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Exports\UserExport;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
+use App\Imports\UserImport;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -143,7 +146,6 @@ class UserController extends Controller
         }
     }
 
-
     /**
      * Mengupdate status user dari loading menjadi active.
      *
@@ -158,7 +160,7 @@ class UserController extends Controller
         // Pastikan pengguna ditemukan
         if ($user) {
             // Update status pengguna menjadi 'active'
-            $user->status = 'active';
+            $user->status = 'Aktif';
             $user->save();
 
             return response()->json(['message' => 'Status pengguna berhasil diperbarui menjadi aktif.']);
@@ -191,5 +193,21 @@ class UserController extends Controller
 
         // Jika gagal menghapus, kembalikan respons gagal dengan Api Resource
         return new UserResource(false, 'Data User Gagal Dihapus!', null);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        Excel::import(new UserImport, $request->file('file'));
+
+        return response()->json(['message' => 'Products imported successfully'], 200);
+    }
+
+    public function export()
+    {
+        return Excel::download(new UserExport, 'users.xlsx');
     }
 }

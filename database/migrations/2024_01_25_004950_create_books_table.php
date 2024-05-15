@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('publisher');
             $table->enum('category', ['Buku Fiksi','Buku Pengetahuan (Non paket)','Kamus','Ensiklopedia','Al-Quran tafsir'])->nullable();
             $table->string('image');
-            $table->enum('status', ['available','returned','sold out'])->default('available');
+            $table->enum('status', ['Tersedia','Habis'])->default('Tersedia');
             $table->timestamps();
         });
     }

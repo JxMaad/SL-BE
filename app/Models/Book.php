@@ -34,12 +34,12 @@ class Book extends Model
         return $this->belongsTo(User::class);
     }
 
-        /**
+    /**
      * book
      * 
      * @return void
      */
-    public function borrow() 
+    public function borrow()
     {
         return $this->belongsTo(Borrow::class);
     }
@@ -49,16 +49,15 @@ class Book extends Model
      * 
      * @return void
      */
-    public function restore() 
+    public function restore()
     {
         return $this->hasOne(Restore::class);
     }
 
     /**
      * image
-     * ini fungsi Accesor -> getter/mengambil data dari database
-     * untuk menyeragamkan format image
-     * @return Attributs
+     * 
+     * @return Attribute
      */
     protected function image(): Attribute
     {

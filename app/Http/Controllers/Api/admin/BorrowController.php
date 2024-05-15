@@ -30,13 +30,10 @@ class BorrowController extends Controller
         // Validasi request
         $request->validate([
             'book_id' => 'required|exists:books,id',
-            'amount_borrowed' => 'required|integer|min:1', // Tambahkan validasi untuk jumlah yang dipinjam
+            
         ], [
             'book_id.required' => 'ID buku diperlukan.',
             'book_id.exists' => 'Buku tidak ditemukan.',
-            'amount_borrowed.required' => 'Jumlah buku yang dipinjam diperlukan.',
-            'amount_borrowed.integer' => 'Jumlah buku yang dipinjam harus berupa bilangan bulat.',
-            'amount_borrowed.min' => 'Jumlah buku yang dipinjam harus minimal 1.',
         ]);
 
         // Dapatkan buku dari database
@@ -51,15 +48,9 @@ class BorrowController extends Controller
         $borrow = Borrow::create([
             'book_id' => $request->input('book_id'),
             'user_id' => $userId, // Gunakan ID pengguna dari pengguna yang sedang login
-            'amount_borrowed' => $request->input('amount_borrowed'), // Simpan jumlah yang dipinjam
         ]);
 
         if ($borrow) {
-            // Kurangi stok buku sesuai dengan jumlah yang dipinjam
-            $book->stock_amount -= $request->input('amount_borrowed');
-
-            // Simpan perubahan stok buku
-            $book->save();
 
             // Return success with API Resource
             return new BorrowResource(true, 'Data peminjaman berhasil disimpan!', $borrow);
@@ -91,16 +82,16 @@ class BorrowController extends Controller
         // Pastikan permohonan peminjaman ditemukan
         if ($borrow) {
             // Periksa apakah status permohonan peminjaman saat ini adalah 'pending'
-            if ($borrow->status === 'pending') {
+            if ($borrow->status === 'Menunggu') {
                 // Update status permohonan peminjaman
                 $borrow->borrowing_start = now();
                 $borrow->borrowing_end = now()->addDays(7); // Misalnya, peminjaman selama 7 hari
-                $borrow->status = 'accepted';
+                $borrow->status = 'Diterima';
                 $borrow->save();
 
-                // Update status buku menjadi 'returned'
+                // Update status buku menjadi 'sold out'
                 $book = Book::find($borrow->book_id);
-                $book->status = 'sold out';
+                $book->status = 'Habis';
                 $book->save();
 
                 return response()->json(['message' => "Status permohonan peminjaman berhasil diperbarui."]);
@@ -142,6 +133,23 @@ class BorrowController extends Controller
 
         // Kembalikan file PDF sebagai respons
         return $pdf->stream('Laporan Peminjaman Buku Perbulan.pdf');
+    }
+
+    public function destroy($id)
+    {
+        // Cari buku berdasarkan ID
+        $borrow = Borrow::findOrFail($id);
+
+        // Jika buku ditemukan
+        if ($borrow) {
+            // Hapus buku dari database
+            if ($borrow->delete()) {
+                // Mengembalikan respons berhasil
+                return new BorrowResource(true, 'Data peminjaman berhasil dihapus!', null);
+            }
+        }
+        // Mengembalikan respons gagal jika buku tidak ditemukan atau gagal dihapus
+        return new BorrowResource(false, 'Data peminjaman gagal dihapus!', null);
     }
 
     /**

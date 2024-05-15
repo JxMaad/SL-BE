@@ -31,7 +31,7 @@ class GuestBookController extends Controller
             'class' => 'required',
             'departemen' => 'required',
             'email' => 'required',
-            'goals' => 'required|enum',
+            'goals' => 'required',
             'telp'  => 'required',
         ]);
 
@@ -66,7 +66,7 @@ class GuestBookController extends Controller
             'class' => 'required',
             'departemen' => 'required',
             'email' => 'required',
-            'goals' => 'required|enum',
+            'goals' => 'required',
             'telp'  => 'required',
         ]);
 
@@ -74,7 +74,7 @@ class GuestBookController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $guest = GuestBook::create([
+        $guest->update([
             'name' => $request->input('name'),
             'class' => $request->input('class'),
             'departemen' => $request->input('departemen'),

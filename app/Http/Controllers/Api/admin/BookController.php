@@ -20,7 +20,7 @@ class BookController extends Controller
     public function index()
     {
         // Get all books regardless of the user
-        $books = Book::latest()->paginate(6);
+        $books = Book::latest()->paginate(8);
 
         // Append query string to pagination links
         $books->appends(['search' => request()->search]);
@@ -49,8 +49,8 @@ class BookController extends Controller
             'stock_amount' => 'nullable|integer',
             'published' => 'required',
             'publisher' => 'required',
-            'category' => 'nullable|enum',
-            'image' => 'required|file|mimes:jpeg,jpg,png|max:2000',
+            'category' => 'nullable',
+            'image' => 'required|image|mimes:jpeg,jpg,png|max:2048',
 
         ]);
 
@@ -58,14 +58,9 @@ class BookController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        //upload image
+        // Simpan gambar ke storage
         $image = $request->file('image');
-        $imagePath = $image->storeAs('public/books', $image->hashName());
-
-        // Pastikan image berhasil di-upload
-        if (!$imagePath) {
-            return new BookResource(false, 'Gagal mengunggah gambar!', null);
-        }
+        $image->storeAs('public/books', $image->hashName());
 
         //create book
         $book = Book::create([
@@ -78,8 +73,11 @@ class BookController extends Controller
             'published' => $request->input('published'),
             'publisher' => $request->input('publisher'),
             'category' => $request->category,
-            'image' => $imagePath, // Menggunakan path yang disimpan
+            'image' => $image->hashName(), // Menggunakan path yang disimpan
         ]);
+
+        // Simpan nama file gambar ke dalam database
+        $book->save();
 
         if ($book) {
             //return success with Api Resource
@@ -134,23 +132,26 @@ class BookController extends Controller
             'stock_amount' => 'required|integer',
             'published' => 'required',
             'publisher' => 'required',
-            'category' => 'required|enum',
-            'image' => 'required|file|mimes:jpeg,jpg,png|max:2000',
+            'category' => 'required',
+            'image' => 'required|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        //check image update
+        // //check image update
         if ($request->file('image')) {
 
-            //remove old image
-            Storage::disk('local')->delete('public/books' . basename($book->image));
+            // Jika ada gambar baru diunggah
+            if ($request->hasFile('image')) {
+                //remove old image
+                Storage::disk('local')->delete('public/books/' . basename($book->image));
 
-            //upload new image
-            $image = $request->file('image');
-            $imagePath = $image->storeAs('public/books', $image->hashName());
+                //upload new image
+                $image = $request->file('image');
+                $image->storeAs('public/books', $image->hashName());
+            }
 
             //update new image
             $book->update([
@@ -163,7 +164,7 @@ class BookController extends Controller
                 'published' => $request->input('published'),
                 'publisher' => $request->input('publisher'),
                 'category' => $request->category,
-                'image' => $imagePath,
+                'image' => $image->hashName(),
             ]);
         } else {
             //update no image
@@ -179,6 +180,8 @@ class BookController extends Controller
                 'category' => $request->category,
             ]);
         }
+
+        $book->save();
 
         // check if the update was successful
         if ($book->wasChanged()) {
@@ -199,11 +202,12 @@ class BookController extends Controller
     public function destroy($id)
     {
         // Cari buku berdasarkan ID
-        $book = Book::find($id);
+        $book = Book::findOrFail($id);
 
         // Jika buku ditemukan
         if ($book) {
-            // Hapus gambar
+            // Hapus gambar dari storage
+            //remove image
             Storage::disk('local')->delete('public/books/' . basename($book->image));
 
             // Hapus buku dari database

@@ -71,42 +71,27 @@ class RestoreController extends Controller
         $returnBook->book_id = $borrow->book_id;
         $returnBook->user_id = $borrow->user_id;
         $returnBook->borrow_id = $borrow->id;
-        $returnBook->status = 'pending'; // Pengembalian masih menunggu pengecekan admin
+        $returnBook->status = 'Menunggu'; // Pengembalian masih menunggu pengecekan admin
         $returnBook->save();
 
         // Ubah status pengembalian menjadi selesai dikembalikan
-        $returnBook->status = 'returned';
+        $returnBook->status = 'Dikembalikan';
         $returnBook->save();
         
         // Ubah status peminjaman menjadi selesai
-        $borrow->status = 'completed';
+        $borrow->status = 'Selesai';
         $borrow->save();
 
         // Hitung denda jika ada
         $this->returnCheckFine($returnBook->id);
 
-        // Ambil data buku yang dipinjam
-        $borrowedBook = Book::find($borrow->book_id);
-        if ($borrowedBook) {
-            // Simpan jumlah buku yang dipinjam sebelum mengurangi stok
-            $borrowedAmount = $borrowedBook->stock_amount;
-
-            // Update stok buku yang dikembalikan agar sama dengan stok yang dipinjam
-            $returnedBook = Book::find($borrow->book_id);
-            if ($returnedBook) {
-                $returnedBook->stock_amount += $borrowedAmount; // Tambahkan stok yang dipinjam
-                // Jika stok buku sebelumnya habis dan sekarang menjadi tersedia, ubah statusnya menjadi "available"
-                if ($returnedBook->stock_amount > 0 && $returnedBook->status != 'available') {
-                    // $returnedBook->status = 'available';
-                    $returnedBook->save();
-                }
-
-                return response()->json(['message' => 'Buku berhasil dikembalikan.']);
-            }
-
-            // Jika buku tidak ditemukan
-            return response()->json(['message' => 'Buku tidak ditemukan.'], 404);
+        if ($returnBook) {
+            //return success with Api resource
+            return new RestoreResource(true, 'Berhasil Dikembalikan', $returnBook);
         }
+
+        //return failed with Api Resource
+        return new RestoreResource(false, 'Gagal dikembalikan', null);
     }
 
     public function returnCheckFine($id)
@@ -134,11 +119,11 @@ class RestoreController extends Controller
                     $fine = $daysLate * 1000; // Misalnya, denda Rp 1000 per hari
 
                     // Update status pengembalian menjadi 'overdue' dan simpan denda
-                    $returnBook->status = 'overdue';
+                    $returnBook->status = 'Denda';
                     $returnBook->fine = $fine;
                     $returnBook->save();
 
-                    return response()->json(['message' => 'Denda berhasil dihitung.', 'denda' => $fine]);
+                    return response()->json(['message' => 'Denda berhasil dihitung.', 'Denda' => $fine]);
                 } else {
                     return response()->json(['message' => 'Tidak ada denda yang harus dibayar.']);
                 }
@@ -179,6 +164,23 @@ class RestoreController extends Controller
 
         // Kembalikan file PDF sebagai respons
         return $pdf->stream('Laporan Pengembalian Buku Perbulan.pdf');
+    }
+
+    public function destroy($id)
+    {
+        // Cari buku berdasarkan ID
+        $restore = Restore::findOrFail($id);
+
+        // Jika buku ditemukan
+        if ($restore) {
+            // Hapus buku dari database
+            if ($restore->delete()) {
+                // Mengembalikan respons berhasil
+                return new RestoreResource(true, 'Data pengembalian berhasil dihapus!', null);
+            }
+        }
+        // Mengembalikan respons gagal jika buku tidak ditemukan atau gagal dihapus
+        return new RestoreResource(false, 'Data pengembalian gagal dihapus!', null);
     }
 
     // /**

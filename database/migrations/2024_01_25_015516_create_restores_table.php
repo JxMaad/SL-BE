@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('book_id')->references('id')->on('books')->cascadeOnDelete();
             $table->foreignId('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreignId('borrow_id')->references('id')->on('borrows')->cascadeOnDelete();
-            $table->enum('status', ['pending', 'accepted', 'returned', 'overdue'])->default('pending');
+            $table->enum('status', ['Menunggu', 'Dikembalikan', 'Denda'])->default('Menunggu');
             $table->timestamps();
         });
     }
