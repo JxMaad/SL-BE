@@ -56,7 +56,7 @@ class PermissionsTableSeeder extends Seeder
         Permission::create(['name' => 'borrows.index', 'guard_name' => 'api']);
         Permission::create(['name' => 'borrows.create', 'guard_name' => 'api']);
         Permission::create(['name' => 'borrows.edit', 'guard_name' => 'api']);
-        Permission::create(['name' => 'borrows.delet', 'guard_name' => 'api']);
+        Permission::create(['name' => 'borrows.delete', 'guard_name' => 'api']);
 
         // //permission for restore
         Permission::create(['name' => 'restores', 'guard_name' => 'api']);

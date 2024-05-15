@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('stock_amount');
             $table->year('published');
             $table->string('publisher');
-            $table->enum('category', ['Buku Fiksi','Buku Pengetahuan (Non paket)','Kamus','Ensiklopedia','Al-Quran tafsir'])->nullable();
+            $table->enum('category', ['Buku Fiksi','Buku Pengetahuan (Non paket)','Kamus','Ensiklopedia','Al-Quran tafsir','Buku Paket'])->nullable();
             $table->string('image');
             $table->enum('status', ['Tersedia','Habis'])->default('Tersedia');
             $table->timestamps();
