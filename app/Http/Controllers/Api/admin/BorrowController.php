@@ -7,6 +7,7 @@ use App\Models\Borrow;
 use App\Http\Resources\BorrowResource;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
+use App\Models\Restore;
 use Illuminate\Support\Facades\Auth; // Tambahkan ini
 use Dompdf\Dompdf;
 
@@ -18,7 +19,18 @@ class BorrowController extends Controller
         $borrows = Borrow::with('user', 'book')->latest()->paginate(10);
 
         // Return with Api Resource
-        return new BorrowResource(true, 'List Data borrows', $borrows);
+        return new BorrowResource(true, 'List Data peminjaman', $borrows);
+    }
+
+    public function indexBorrowUserId(Request $request)
+    {
+        $user = $request->user();
+
+        $borrow = Borrow::where('user_id', $user->id)->get();
+
+        return response()->json([
+            'List Data Peminjaman User' => $borrow,
+        ]);
     }
 
     public function store(Request $request)

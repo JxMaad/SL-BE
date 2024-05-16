@@ -23,6 +23,17 @@ class RestoreController extends Controller
         return new RestoreResource(true, 'List Data Pengembalian', $restore);
     }
 
+    public function indexRestoreUserId(Request $request)
+    {
+        $user = $request->user();
+
+        $returnBook = Restore::where('user_id', $user->id)->get();
+
+        return response()->json([
+            'List Data Pengembalian User' => $returnBook,
+        ]);
+    }
+
     public function show(Restore $restore, $id)
     {
         //get restore
@@ -126,7 +137,6 @@ class RestoreController extends Controller
         }
     }
 
-
     public function returnCheckFine($id)
     {
         // Cari pengembalian berdasarkan ID
@@ -152,7 +162,7 @@ class RestoreController extends Controller
                     $fine = $daysLate * 1000; // Misalnya, denda Rp 1000 per hari
 
                     // Update status pengembalian menjadi 'overdue' dan simpan denda
-                    $returnBook->status = 'Denda';
+                    $returnBook->status = 'Denda Belum Dibayar';
                     $returnBook->fine = $fine;
                     $returnBook->save();
 
@@ -167,6 +177,8 @@ class RestoreController extends Controller
             return response()->json(['message' => 'Pengembalian tidak ditemukan.'], 404);
         }
     }
+
+        
 
     public function generateRestorePdf(Request $request)
     {
