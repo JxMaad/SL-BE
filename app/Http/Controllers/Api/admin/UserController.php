@@ -203,7 +203,7 @@ class UserController extends Controller
 
         Excel::import(new UserImport, $request->file('file'));
 
-        return response()->json(['message' => 'Products imported successfully'], 200);
+        return response()->json(['message' => 'User berhasil diimport!'], 200);
     }
 
     public function export()

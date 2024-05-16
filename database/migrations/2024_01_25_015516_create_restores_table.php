@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('restores', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('returndate');
+            $table->date('returndate');
             $table->float('fine')->nullable();
             $table->foreignId('book_id')->references('id')->on('books')->cascadeOnDelete();
             $table->foreignId('user_id')->references('id')->on('users')->cascadeOnDelete();

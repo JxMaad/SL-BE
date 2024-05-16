@@ -99,6 +99,14 @@ class RestoreController extends Controller
                 $returnBook->status = 'Dikembalikan';
                 $returnBook->save();
 
+                // Cari buku terkait menggunakan book_id dari permohonan pengembalian
+                $book = Book::find($returnBook->book_id);
+
+                // Tambah stok buku
+                $book->stock_amount += 1;
+                $book->status = 'Tersedia';
+                $book->save();
+
                 // Cari permohonan peminjaman terkait menggunakan book_id
                 $borrow = Borrow::where('book_id', $returnBook->book_id)->first();
 
@@ -117,6 +125,7 @@ class RestoreController extends Controller
             return response()->json(['message' => 'Permohonan pengembalian tidak ditemukan.'], 404);
         }
     }
+
 
     public function returnCheckFine($id)
     {

@@ -90,10 +90,17 @@ class BorrowController extends Controller
                 $borrow->status = 'Diterima';
                 $borrow->save();
 
-                // Update status buku menjadi 'sold out'
+                // Update stok buku dan status jika stok sudah habis
                 $book = Book::find($borrow->book_id);
-                $book->status = 'Habis';
-                $book->save();
+                if ($book) {
+                    // Periksa apakah stok buku habis
+                    if ($book->stock_amount == 0) {
+                        $book->status = 'Habis';
+                    }
+
+                    // Simpan perubahan pada buku
+                    $book->save();
+                }
 
                 return response()->json(['message' => "Status permohonan peminjaman berhasil diperbarui."]);
             } else {
