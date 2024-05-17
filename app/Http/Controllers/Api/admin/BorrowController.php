@@ -22,14 +22,13 @@ class BorrowController extends Controller
         return new BorrowResource(true, 'List Data peminjaman', $borrows);
     }
 
-    public function indexBorrowUserId()
+    public function indexBorrowUserId(Request $request)
     {
-        // Mendapatkan user yang sedang login
-        $userId = Auth::id();
-
-        // Mendapatkan peminjaman berdasarkan user ID
-        $borrow = Borrow::where('user_id', $userId)->get();
-
+        $user = $request->user();
+    
+        // Ambil data peminjaman dengan relasi user dan book berdasarkan user ID
+        $borrow = Borrow::with('user', 'book')->where('user_id', $user->id)->latest()->get();
+    
         // Mengembalikan data dalam format JSON
         return response()->json([
             'status' => 'success',

@@ -18,20 +18,19 @@ class RestoreController extends Controller
     public function index()
     {
         // Ambil data peminjaman dengan relasi user dan book
-        $restore = Restore::with('user', 'book', 'borrow')->latest()->paginate(10);
+        $restores = Restore::with('user', 'book', 'borrow')->latest()->paginate(10);
 
         // Return with Api Resource
-        return new RestoreResource(true, 'List Data Pengembalian', $restore);
+        return new RestoreResource(true, 'List Data Pengembalian', $restores);
     }
 
-    public function indexRestoreUserId()
+    public function indexRestoreUserId(Request $request)
     {
-        // Mendapatkan user yang sedang login
-        $userId = Auth::id();
-
-        // Mendapatkan peminjaman berdasarkan user ID
-        $restore = Restore::where('user_id', $userId)->get();
-
+        $user = $request->user();
+    
+        // Ambil data peminjaman dengan relasi user dan book berdasarkan user ID
+        $restore = Borrow::with('user', 'book', 'borrow')->where('user_id', $user->id)->latest()->get();
+    
         // Mengembalikan data dalam format JSON
         return response()->json([
             'status' => 'success',

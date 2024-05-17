@@ -41,7 +41,7 @@ class Book extends Model
      */
     public function borrow()
     {
-        return $this->belongsTo(Borrow::class);
+        return $this->hasMany(Borrow::class);
     }
 
     /**
