@@ -10,6 +10,7 @@ use App\Http\Resources\RestoreResource;
 use App\Models\Book;
 use App\Models\Restore;
 use Dompdf\Dompdf;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class RestoreController extends Controller
@@ -23,15 +24,19 @@ class RestoreController extends Controller
         return new RestoreResource(true, 'List Data Pengembalian', $restore);
     }
 
-    public function indexRestoreUserId(Request $request)
+    public function indexRestoreUserId()
     {
-        $user = $request->user();
+        // Mendapatkan user yang sedang login
+        $userId = Auth::id();
 
-        $returnBook = Restore::where('user_id', $user->id)->get();
+        // Mendapatkan peminjaman berdasarkan user ID
+        $restore = Restore::where('user_id', $userId)->get();
 
+        // Mengembalikan data dalam format JSON
         return response()->json([
-            'List Data Pengembalian User' => $returnBook,
-        ]);
+            'status' => 'success',
+            'data' => $restore
+        ], 200);
     }
 
     public function show(Restore $restore, $id)
@@ -178,7 +183,7 @@ class RestoreController extends Controller
         }
     }
 
-        
+
 
     public function generateRestorePdf(Request $request)
     {

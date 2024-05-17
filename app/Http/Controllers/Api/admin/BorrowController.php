@@ -22,15 +22,19 @@ class BorrowController extends Controller
         return new BorrowResource(true, 'List Data peminjaman', $borrows);
     }
 
-    public function indexBorrowUserId(Request $request)
+    public function indexBorrowUserId()
     {
-        $user = $request->user();
+        // Mendapatkan user yang sedang login
+        $userId = Auth::id();
 
-        $borrow = Borrow::where('user_id', $user->id)->get();
+        // Mendapatkan peminjaman berdasarkan user ID
+        $borrow = Borrow::where('user_id', $userId)->get();
 
+        // Mengembalikan data dalam format JSON
         return response()->json([
-            'List Data Peminjaman User' => $borrow,
-        ]);
+            'status' => 'success',
+            'data' => $borrow
+        ], 200);
     }
 
     public function store(Request $request)
@@ -80,7 +84,7 @@ class BorrowController extends Controller
 
         if ($borrow) {
             //return success with Api resource
-            return new BorrowResource(true, 'Detail Data borrow', $borrow);
+            return new BorrowResource(true, 'Detail Data peminjaman', $borrow);
         }
 
         //return failed with Api Resource
@@ -116,7 +120,7 @@ class BorrowController extends Controller
 
                 return response()->json(['message' => "Status permohonan peminjaman berhasil diperbarui."]);
             } else {
-                return response()->json(['message' => 'Permohonan peminjaman tidak dalam status pending.'], 400);
+                return response()->json(['message' => 'Permohonan peminjaman tidak dalam status menunggu.'], 400);
             }
         } else {
             return response()->json(['message' => 'Permohonan peminjaman tidak ditemukan.'], 404);

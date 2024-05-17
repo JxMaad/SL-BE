@@ -10,7 +10,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "kawankoding/laravel-fcm": "^0.2.8",
         "laravel/framework": "^10.10",
-        "laravel/sanctum": "^3.2",
+        "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "maatwebsite/excel": "^3.1",
         "spatie/laravel-permission": "^5.10",

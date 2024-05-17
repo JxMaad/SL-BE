@@ -67,7 +67,7 @@ Route::middleware('auth:api')->group(function () {
         Route::put('/{id}/update-status', [BorrowController::class, 'updateStatusBorrow'])->middleware(['permission:borrows.edit', 'role:admin|pustakawan']);
         Route::post('/generateBorrowPdf', [BorrowController::class, 'generateBorrow'])->middleware(['permission:borrows.index', 'role:admin|pustakawan']);
         Route::delete('/{id}', [BorrowController::class, 'destroy'])->middleware(['permission:borrows.delete', 'role:admin|pustakawan']);
-        Route::get('/{id}/index-borrow', [BorrowController::class, 'indexBorrowUserId'])->middleware(['role:anggota']);
+        Route::get('/{user_id}/index-borrow', [BorrowController::class, 'indexBorrowUserId'])->middleware(['role:anggota']);
     });
 
     Route::prefix('restore')->group(function () {
@@ -78,7 +78,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/generateRestorePdf', [RestoreController::class, 'generateRestorePdf'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::delete('/{id}', [RestoreController::class, 'destroy'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::put('/{id}/update-status', [RestoreController::class, 'updateStatusReturn'])->middleware(['permission:restores', 'role:admin|pustakawan']);
-        Route::get('/{id}/index-restore', [RestoreController::class, 'indexRestoreUserId'])->middleware(['role:anggota']);
+        Route::get('/{user_id}/index-restore', [RestoreController::class, 'indexRestoreUserId'])->middleware(['role:anggota']);
     });
 
     Route::prefix('guestbook')->group(function () {
