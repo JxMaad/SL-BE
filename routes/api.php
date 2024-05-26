@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\Admin\BookController;
 use App\Http\Controllers\Api\Admin\BorrowController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\DashboardController;
+use App\Http\Controllers\Api\Admin\ExportUser;
 use App\Http\Controllers\Api\admin\GuestBookController;
+use App\Http\Controllers\Api\Admin\ImportUser;
 use App\Http\Controllers\Api\Admin\MemberController;
 use App\Http\Controllers\api\admin\RestoreController;
 use App\Http\Controllers\api\admin\ReturncheckController;
@@ -47,8 +49,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}/update', [UserController::class, 'update'])->middleware(['permission:users.edit']);
         Route::delete('/{id}', [UserController::class, 'destroy'])->middleware(['permission:users.delete', 'role:admin|pustakawan']);
         Route::put('/{id}/update-status', [UserController::class, 'updateStatusUser'])->middleware('permission:users.edit', 'role:admin|pustakawan');
-        Route::get('/export-user', [UserController::class, 'export'])->middleware(['role:admin|pustakawan']);
-        Route::post('/import-user', [UserController::class, 'import'])->middleware(['role:admin|pustakawan']);
+        Route::get('/export-user', [ExportUser::class, 'export'])->middleware(['role:admin|pustakawan']);
+        Route::post('/import-user', [ImportUser::class, 'import'])->middleware(['role:admin|pustakawan']);
     });
 
     Route::prefix('book')->group(function () {

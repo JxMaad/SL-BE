@@ -194,20 +194,4 @@ class UserController extends Controller
         // Jika gagal menghapus, kembalikan respons gagal dengan Api Resource
         return new UserResource(false, 'Data User Gagal Dihapus!', null);
     }
-
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
-        ]);
-
-        Excel::import(new UserImport, $request->file('file'));
-
-        return response()->json(['message' => 'User berhasil diimport!'], 200);
-    }
-
-    public function export()
-    {
-        return Excel::download(new UserExport, 'users.xlsx');
-    }
 }
