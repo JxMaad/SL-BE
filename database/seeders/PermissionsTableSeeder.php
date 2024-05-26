@@ -28,6 +28,10 @@ class PermissionsTableSeeder extends Seeder
         'users.create',
         'users.edit',
         'users.delete',
+        'guest.index',
+        'guest.create',
+        'guest.edit',
+        'guest.delete',
     ];
 
     // Default permissions for different roles.
