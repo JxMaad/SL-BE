@@ -84,9 +84,9 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::prefix('guestbook')->group(function () {
-        Route::get('/', [GuestBookController::class, 'indexGuest'])->middleware(['permission:guest.index']);
-        Route::post('/create', [GuestBookController::class, 'storeGuest'])->middleware(['permission:guest.create']);
-        Route::post('/{id}/update', [GuestBookController::class, 'updateGuest'])->middleware(['permission:guest.edit']);
-        Route::delete('/{id}', [GuestBookController::class, 'destroyGuest'])->middleware(['permission:guest.delete']);
+        Route::get('/', [GuestBookController::class, 'indexGuest'])->middleware(['permission:guest.index', 'role:admin|pustakawan']);
+        Route::post('/create', [GuestBookController::class, 'storeGuest'])->middleware(['permission:guest.create', 'role:admin|pustakawan']);
+        Route::post('/{id}/update', [GuestBookController::class, 'updateGuest'])->middleware(['permission:guest.edit', 'role:admin|pustakawan']);
+        Route::delete('/{id}', [GuestBookController::class, 'destroyGuest'])->middleware(['permission:guest.delete', 'role:admin|pustakawan']);
     });
 });
