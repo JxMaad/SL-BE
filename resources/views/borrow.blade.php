@@ -30,7 +30,6 @@
                 <th>borrowing_end</th>
                 <th>book_id</th>
                 <th>user_id</th>
-                <th>amount_borrowed</th>
                 <th>status</th>
             </tr>
         </thead>
@@ -41,7 +40,6 @@
                     <td>{{ $data['borrowing_end'] }}</td>
                     <td>{{ $data['book_id'] }}</td>
                     <td>{{ $data['user_id'] }}</td>
-                    <td>{{ $data['amount_borrowed'] }}</td>
                     <td>{{ $data['status'] }}</td>
                 </tr>
             @endforeach

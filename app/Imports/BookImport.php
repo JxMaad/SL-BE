@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\User;
+use App\Models\Book;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -20,19 +20,19 @@ class UserImport implements ToCollection, WithHeadingRow
     {
         foreach ($rows as $row) {
             // Buat pengguna baru
-            $user = User::create([
-                'name' => $row['name'],
-                'email' => $row['email'],
-                'password' => Hash::make($row['password']),
+            $books = Book::create([
+                'title' => $row['title'],
+                'synopsis' => $row['synopsis'],
+                'isbn' => $row['isbn'],
+                'writer' => $row['writer'],
+                'page_amount' => $row['page_amount'],
+                'stock_amount' => $row['stock_amount'],
+                'published' => $row['published'],
+                'publisher' => $row['publisher'],
+                'category' => $row['category'],
+                'image' => $row['image'],
                 'status' => $row['status'],
-                'role_id' => 3, // Tetapkan role_id 3 ('anggota')
             ]);
-
-            // Dapatkan semua permissions dari database dan tetapkan ke pengguna
-            $permissions = Permission::all();
-            foreach ($permissions as $permission) {
-                $user->givePermissionTo($permission->name);
-            }
         }
     }
 }

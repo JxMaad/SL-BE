@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Models\User;
+use App\Models\Book;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -13,7 +13,7 @@ use Spatie\Permission\Models\Role;
 
 class ImportUserController extends Controller
 {
-    public function import(Request $request)
+    public function importBook(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'file' => 'required|file|mimes:xlsx,xls,csv',
@@ -34,9 +34,16 @@ class ImportUserController extends Controller
             $headerRow = 1;
 
             $columnMapping = [
-                'name' => null,
-                'email' => null,
-                'password' => null,
+                'title' => null,
+                'synopsis' => null,
+                'isbn' => null,
+                'writer' => null,
+                'page_amount' => null,
+                'stock_amount' => null,
+                'published' => null,
+                'publisher' => null,
+                'category' => null,
+                'image' => null,
                 'status' => null,
             ];
 
@@ -56,17 +63,14 @@ class ImportUserController extends Controller
             $dataStartRow = 2;
             $dataEndRow = $worksheet->getHighestDataRow();
 
-            $usersData = [];
+            $booksData = [];
 
             for ($row = $dataStartRow; $row <= $dataEndRow; $row++) {
-                $user = [];
+                $book = [];
                 $isRowEmpty = true;
                 foreach ($columnMapping as $key => $column) {
                     $value = $worksheet->getCell($column . $row)->getValue();
-                    if ($key == 'password') {
-                        $value = Hash::make($value); // Hash password before storing
-                    }
-                    $user[$key] = $value;
+                    $book[$key] = $value;
                     if (!empty($value)) {
                         $isRowEmpty = false;
                     }
@@ -76,27 +80,19 @@ class ImportUserController extends Controller
                     continue;
                 }
                 // Check if all required data is present
-                if (array_search(null, $user, true) !== false) {
+                if (array_search(null, $book, true) !== false) {
                     return response()->json(['error' => "Data tidak lengkap pada baris $row. Semua kolom harus diisi."]);
                 }
-                $usersData[] = $user;
+                $booksData[] = $book;
             }
 
-            foreach ($usersData as $data) {
-                $user = User::create($data);
-
-                // Assign role to the user
-                $role = Role::findByName('anggota');
-                $user->assignRole($role);
-
-                // Assign permissions based on the role
-                $permissions = $role->permissions;
-                $user->syncPermissions($permissions);
+            foreach ($booksData as $data) {
+                Book::create($data);
             }
 
-            return response()->json(['success' => 'Data pengguna berhasil di-import!']);
+            return response()->json(['success' => 'Data buku berhasil di-import!']);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Terjadi kesalahan dalam mengimpor data pengguna: ' . $e->getMessage()]);
+            return response()->json(['error' => 'Terjadi kesalahan dalam mengimpor data buku: ' . $e->getMessage()]);
         }
     }
 }

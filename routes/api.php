@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Admin\BookController;
 use App\Http\Controllers\Api\Admin\BorrowController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\DashboardController;
+use App\Http\Controllers\Api\Admin\ExportBookController;
 use App\Http\Controllers\Api\Admin\ExportUserController;
 use App\Http\Controllers\Api\admin\GuestBookController;
 use App\Http\Controllers\Api\Admin\ImportUserController;
@@ -49,7 +50,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}/update', [UserController::class, 'update'])->middleware(['permission:users.edit']);
         Route::delete('/{id}', [UserController::class, 'destroy'])->middleware(['permission:users.delete', 'role:admin|pustakawan']);
         Route::put('/{id}/update-status', [UserController::class, 'updateStatusUser'])->middleware('permission:users.edit', 'role:admin|pustakawan');
-        Route::get('/export-user', [ExportUserController::class, 'export'])->middleware(['role:admin|pustakawan']);
         Route::post('/import-user', [ImportUserController::class, 'import'])->middleware(['role:admin|pustakawan']);
     });
 
@@ -60,6 +60,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}/update', [BookController::class, 'update'])->middleware(['permission:books.edit', 'role:admin|pustakawan']);
         Route::delete('/{id}', [BookController::class, 'destroy'])->middleware(['permission:books.delete', 'role:admin|pustakawan']);
         Route::put('/{id}/update-status', [BookController::class, 'updateStatusBook'])->middleware('permission:books.edit', 'role:admin|pustakawan');
+        Route::post('/import-book', [ImportUserController::class, 'importBook'])->middleware(['role:admin|pustakawan']);
     });
 
     Route::prefix('borrow')->group(function () {
@@ -81,6 +82,7 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/{id}', [RestoreController::class, 'destroy'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::put('/{id}/update-status', [RestoreController::class, 'updateStatusReturn'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::get('/{user_id}/index-restore', [RestoreController::class, 'indexRestoreUserId'])->middleware(['role:anggota']);
+        Route::put('/{id}/update-fine', [RestoreController::class, 'updateStatusFine'])->middleware(['permission:restores', 'role:admin|pustakawan']);
     });
 
     Route::prefix('guestbook')->group(function () {
@@ -89,4 +91,11 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}/update', [GuestBookController::class, 'updateGuest'])->middleware(['permission:guest.edit']);
         Route::delete('/{id}', [GuestBookController::class, 'destroyGuest'])->middleware(['permission:guest.delete']);
     });
+
+    Route::get('/alluser/export', [ExportUserController::class, 'export'])->middleware(['role:admin|pustakawan']);
+
+    Route::get('/allbook/export', [ExportBookController::class, 'exportBook'])->middleware(['role:admin|pustakawan']);
+
+    Route::get('/book-restore/index-fine', [RestoreController::class, 'indexFine'])->middleware(['permission:restores','role:anggota']);
+
 });

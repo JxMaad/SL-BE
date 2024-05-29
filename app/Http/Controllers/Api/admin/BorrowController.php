@@ -43,10 +43,14 @@ class BorrowController extends Controller
 
         // Validasi request
         $request->validate([
+            'borrowing_start' => 'required',
+            'borrowing_end' => 'required',
             'book_id' => 'required|exists:books,id',
         ], [
             'book_id.required' => 'ID buku diperlukan.',
             'book_id.exists' => 'Buku tidak ditemukan.',
+            'borrowing_start.required' => 'Tanggal awal minjam wajib di isi',
+            'borrowing_end.required' => 'Tanggal akhir minjma wajib di isi',
         ]);
 
         // Dapatkan buku dari database
@@ -59,6 +63,8 @@ class BorrowController extends Controller
 
         // Create borrow jika buku tersedia
         $borrow = Borrow::create([
+            'borrowing_start' => $request->input('borrowing_start'),
+            'borrowing_end' => $request->input('borrowing_end'),
             'book_id' => $request->book_id, // Gunakan ID buku dari request
             'user_id' => $userId, // Gunakan ID pengguna dari pengguna yang sedang login
         ]);
@@ -100,8 +106,8 @@ class BorrowController extends Controller
             // Periksa apakah status permohonan peminjaman saat ini adalah 'pending'
             if ($borrow->status === 'Menunggu') {
                 // Update status permohonan peminjaman
-                $borrow->borrowing_start = now();
-                $borrow->borrowing_end = now()->addDays(7); // Misalnya, peminjaman selama 7 hari
+                $borrow->borrowing_start = $borrow->borrowing_start;
+                $borrow->borrowing_end = $borrow->borrowing_end;
                 $borrow->status = 'Diterima';
                 $borrow->save();
 
@@ -130,16 +136,17 @@ class BorrowController extends Controller
     {
         $borrow = Borrow::all();
 
+        $borrows = Borrow::with('user', 'book');
+
         $dataList = [];
 
-        foreach ($borrow as $borrow) {
+        foreach ($borrow as $borrows) {
             $dataList[] = [
-                'borrowing_start' => $borrow->borrowing_start,
-                'borrowing_end' => $borrow->borrowing_end,
-                'book_id' => $borrow->book_id,
-                'user_id' => $borrow->user_id,
-                'amount_borrowed' => $borrow->amount_borrowed,
-                'status' => $borrow->status,
+                'borrowing_start' => $borrows->borrowing_start,
+                'borrowing_end' => $borrows->borrowing_end,
+                'book_id' => $borrows->book_id,
+                'user_id' => $borrows->user_id,
+                'status' => $borrows->status,
                 // Tambahkan data lain yang diperlukan
             ];
         }
