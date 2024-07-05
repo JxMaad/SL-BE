@@ -78,7 +78,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/{id}/check-fine', [RestoreController::class, 'returnCheckFine'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::get('/{id}', [RestoreController::class, 'show'])->middleware(['permission:restores']);
         Route::post('/{id}',[RestoreController::class, 'returnBookUser'])->middleware(['permission:restores', 'role:admin|pustakawan']);
-        Route::post('/generateRestorePdf', [RestoreController::class, 'generateRestorePdf'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::delete('/{id}', [RestoreController::class, 'destroy'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::put('/{id}/update-status', [RestoreController::class, 'updateStatusReturn'])->middleware(['permission:restores', 'role:admin|pustakawan']);
         Route::get('/{user_id}/index-restore', [RestoreController::class, 'indexRestoreUserId'])->middleware(['role:anggota']);
@@ -97,5 +96,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/allbook/export', [ExportBookController::class, 'exportBook'])->middleware(['role:admin|pustakawan']);
 
     Route::get('/book-restore/index-fine', [RestoreController::class, 'indexFine'])->middleware(['permission:restores','role:anggota']);
+
+    Route::post('/generateRestorePdf', [RestoreController::class, 'generateRestore'])->middleware(['permission:restores', 'role:admin|pustakawan']);
 
 });

@@ -74,10 +74,10 @@ class RestoreController extends Controller
             'status' => 'required|string',
         ]);
 
-        // Jika validasi gagal atau peminjaman tidak ditemukan
-        if ($validator->fails() || !$borrow) {
-            return response()->json(['message' => 'Gagal input bro-bro'], 422);
-        }
+        // // Jika validasi gagal atau peminjaman tidak ditemukan
+        // if ($validator->fails() || !$borrow) {
+        //     return response()->json(['message' => 'Gagal input bro-bro'], 422);
+        // }
 
         // Update peminjaman dengan data pengembalian yang baru
         $borrow->update([
@@ -234,21 +234,21 @@ class RestoreController extends Controller
         }
     }
 
-    public function generateRestorePdf(Request $request)
+    public function generateRestore(Request $request)
     {
-        $returnBook = Restore::all();
+        $restore = Restore::all();
 
-        $returnBook = Restore::with('user', 'book', 'borrow')->get();
+        $restores = Restore::with('user', 'book', 'borrow')->get(); // Mengambil semua data peminjaman dengan relasi user dan book
 
         $dataList = [];
 
-        foreach ($returnBook as $returnBook) {
+        foreach ($restore as $restores) {
             $dataList[] = [
-                'returndate' => $returnBook->returndate,
-                'book_id' => $returnBook->book->title,
-                'user_id' => $returnBook->user->name,
-                'borrow_id' => $returnBook->borrow_id,
-                'status' => $returnBook->status,
+                'returndate' => $restores->returndate,
+                'book_id' => $restores->book->title, // Mengambil title dari relasi book
+                'user_id' => $restores->user->name, // Mengambil name dari relasi user
+                'borrow_id' => $restores->borrow_id,
+                'status' => $restores->status,
                 // Tambahkan data lain yang diperlukan
             ];
         }
@@ -256,11 +256,13 @@ class RestoreController extends Controller
         // Load view PDF dengan data yang telah ditentukan
         $pdf = new Dompdf();
 
+        // Render view 'restore' dengan compact data 'dataList' ke dalam HTML
         $html = view('restore', compact('dataList'))->render();
 
+        // Load HTML ke dalam Dompdf
         $pdf->loadHtml($html);
 
-        // Render PDF
+        // Render PDF (proses rendering HTML menjadi PDF)
         $pdf->render();
 
         // Kembalikan file PDF sebagai respons
