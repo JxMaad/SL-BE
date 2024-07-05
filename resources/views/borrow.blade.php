@@ -26,11 +26,11 @@
     <table>
         <thead>
             <tr>
-                <th>borrowing_start</th>
-                <th>borrowing_end</th>
-                <th>book_id</th>
-                <th>user_id</th>
-                <th>status</th>
+                <th>Peminjaman Awal</th>
+                <th>Peminjaman Akhir</th>
+                <th>Buku</th>
+                <th>User</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>

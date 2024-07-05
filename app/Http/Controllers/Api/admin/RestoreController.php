@@ -238,13 +238,15 @@ class RestoreController extends Controller
     {
         $returnBook = Restore::all();
 
+        $returnBook = Restore::with('user', 'book', 'borrow')->get();
+
         $dataList = [];
 
         foreach ($returnBook as $returnBook) {
             $dataList[] = [
                 'returndate' => $returnBook->returndate,
-                'book_id' => $returnBook->book_id,
-                'user_id' => $returnBook->user_id,
+                'book_id' => $returnBook->book->title,
+                'user_id' => $returnBook->user->name,
                 'borrow_id' => $returnBook->borrow_id,
                 'status' => $returnBook->status,
                 // Tambahkan data lain yang diperlukan

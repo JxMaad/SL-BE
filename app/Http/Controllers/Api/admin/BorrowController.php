@@ -8,6 +8,7 @@ use App\Http\Resources\BorrowResource;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\Restore;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth; // Tambahkan ini
 use Dompdf\Dompdf;
 
@@ -25,10 +26,10 @@ class BorrowController extends Controller
     public function indexBorrowUserId(Request $request)
     {
         $user = $request->user();
-    
+
         // Ambil data peminjaman dengan relasi user dan book berdasarkan user ID
         $borrow = Borrow::with('user', 'book')->where('user_id', $user->id)->latest()->get();
-    
+
         // Mengembalikan data dalam format JSON
         return response()->json([
             'status' => 'success',
@@ -49,9 +50,15 @@ class BorrowController extends Controller
         ], [
             'book_id.required' => 'ID buku diperlukan.',
             'book_id.exists' => 'Buku tidak ditemukan.',
-            'borrowing_start.required' => 'Tanggal awal minjam wajib di isi',
-            'borrowing_end.required' => 'Tanggal akhir minjma wajib di isi',
+            'borrowing_start.required' => 'Tanggal awal pinjam wajib diisi.',
+            'borrowing_end.required' => 'Tanggal akhir pinjam wajib diisi.',
         ]);
+
+        $user = User::find($request->user_id);
+
+        if ($user->status != 'Aktif') {
+            return response()->json(['message' => 'User belum aktif tidak dapat meminjam buku'], 403);
+        }
 
         // Dapatkan buku dari database
         $book = Book::findOrFail($request->book_id);
@@ -73,6 +80,9 @@ class BorrowController extends Controller
             $book->stock_amount -= 1;
             $book->save();
 
+            // Mengirim notifikasi
+            $this->sendNotification($request->user()->fcm_token, 'Buku Dipinjam', 'Anda telah meminjam buku.', $request->book_id);
+
             // Return success with API Resource
             return new BorrowResource(true, 'Data peminjaman berhasil disimpan!', $borrow);
         }
@@ -81,6 +91,39 @@ class BorrowController extends Controller
         return new BorrowResource(false, 'Data peminjaman gagal disimpan!', null);
     }
 
+    private function sendNotification($fcmToken, $title, $message, $bookId)
+    {
+        $data = [
+            "to" => $fcmToken,
+            "notification" => [
+                "title" => $title,
+                "body" => $message,
+            ],
+            "data" => [
+                "book_id" => $bookId,
+            ],
+        ];
+
+        $headers = [
+            'Authorization: key=' . env('FCM_SERVER_KEY'),
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $result = curl_exec($ch);
+        if ($result === FALSE) {
+            die('Curl failed: ' . curl_error($ch));
+        }
+        curl_close($ch);
+
+        return $result;
+    }
 
     public function show(Borrow $borrow, $id)
     {
@@ -136,7 +179,7 @@ class BorrowController extends Controller
     {
         $borrow = Borrow::all();
 
-        $borrows = Borrow::with('user', 'book');
+        $borrows = Borrow::with('user', 'book')->get(); // Mengambil semua data peminjaman dengan relasi user dan book
 
         $dataList = [];
 
@@ -144,8 +187,8 @@ class BorrowController extends Controller
             $dataList[] = [
                 'borrowing_start' => $borrows->borrowing_start,
                 'borrowing_end' => $borrows->borrowing_end,
-                'book_id' => $borrows->book_id,
-                'user_id' => $borrows->user_id,
+                'book_id' => $borrows->book->title, // Mengambil title dari relasi book
+                'user_id' => $borrows->user->name, // Mengambil name dari relasi user
                 'status' => $borrows->status,
                 // Tambahkan data lain yang diperlukan
             ];

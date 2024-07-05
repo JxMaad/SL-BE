@@ -26,11 +26,11 @@
     <table>
         <thead>
             <tr>
-                <th>returndate</th>
-                <th>book_id</th>
-                <th>user_id</th>
-                <th>borrow_id</th>
-                <th>status</th>
+                <th>Returndate</th>
+                <th>Buku</th>
+                <th>User</th>
+                <th>Peminjaman</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
