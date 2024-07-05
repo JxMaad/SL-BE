@@ -30,6 +30,7 @@
                 <th>Buku</th>
                 <th>User</th>
                 <th>Peminjaman</th>
+                <th>Denda</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -40,6 +41,7 @@
                     <td>{{ $data['book_id'] }}</td>
                     <td>{{ $data['user_id'] }}</td>
                     <td>{{ $data['borrow_id'] }}</td>
+                    <td>{{ $data['fine'] }}</td>
                     <td>{{ $data['status'] }}</td>
                 </tr>
             @endforeach

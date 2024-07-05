@@ -236,9 +236,14 @@ class RestoreController extends Controller
 
     public function generateRestore(Request $request)
     {
-        $restore = Restore::all();
+        $start_date = $request->query('start_date');
+        $end_date = $request->query('end_date');
 
-        $restores = Restore::with('user', 'book', 'borrow')->get(); // Mengambil semua data peminjaman dengan relasi user dan book
+        $restore = Restore::whereBetween('returndate', [$start_date, $end_date])->get();
+
+        $restores = Restore::with('user', 'book', 'borrow')
+            ->whereBetween('returndate', [$start_date, $end_date])
+            ->get(); // Mengambil data peminjaman dengan filter tanggal
 
         $dataList = [];
 
@@ -248,6 +253,7 @@ class RestoreController extends Controller
                 'book_id' => $restores->book->title, // Mengambil title dari relasi book
                 'user_id' => $restores->user->name, // Mengambil name dari relasi user
                 'borrow_id' => $restores->borrow_id,
+                'fine'  => $restores->fine,
                 'status' => $restores->status,
                 // Tambahkan data lain yang diperlukan
             ];
@@ -266,7 +272,7 @@ class RestoreController extends Controller
         $pdf->render();
 
         // Kembalikan file PDF sebagai respons
-        return $pdf->stream('Laporan Pengembalian Buku Perbulan.pdf');
+        return $pdf->stream('LaporanPengembalianBukuPerbulan.pdf');
     }
 
     public function destroy($id)

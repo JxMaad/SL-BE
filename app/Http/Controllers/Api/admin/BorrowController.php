@@ -177,25 +177,30 @@ class BorrowController extends Controller
 
     public function generateBorrow(Request $request)
     {
-        $borrow = Borrow::all();
+        $start_date = $request->query('start_date');
+        $end_date = $request->query('end_date');
 
-        $borrows = Borrow::with('user', 'book')->get(); // Mengambil semua data peminjaman dengan relasi user dan book
+        $borrow = Borrow::whereBetween('borrowing_start', [$start_date, $end_date])->get();
+
+        $borrows = Borrow::with('user', 'book')
+            ->whereBetween('borrowing_start', [$start_date, $end_date])
+            ->get(); // Mengambil data peminjaman dengan filter tanggal
 
         $dataList = [];
 
-        foreach ($borrow as $borrows) {
+        foreach ($borrows as $borrow) {
             $dataList[] = [
-                'borrowing_start' => $borrows->borrowing_start,
-                'borrowing_end' => $borrows->borrowing_end,
-                'book_id' => $borrows->book->title, // Mengambil title dari relasi book
-                'user_id' => $borrows->user->name, // Mengambil name dari relasi user
-                'status' => $borrows->status,
+                'borrowing_start' => $borrow->borrowing_start,
+                'borrowing_end' => $borrow->borrowing_end,
+                'book_id' => $borrow->book->title, // Mengambil title dari relasi book
+                'user_id' => $borrow->user->name, // Mengambil name dari relasi user
+                'status' => $borrow->status,
                 // Tambahkan data lain yang diperlukan
             ];
         }
 
         // Load view PDF dengan data yang telah ditentukan
-        $pdf = new Dompdf();
+        $pdf = new \Dompdf\Dompdf();
 
         $html = view('borrow', compact('dataList'))->render();
 
@@ -205,7 +210,7 @@ class BorrowController extends Controller
         $pdf->render();
 
         // Kembalikan file PDF sebagai respons
-        return $pdf->stream('Laporan Peminjaman Buku Perbulan.pdf');
+        return $pdf->stream('LaporanPeminjamanBukuPerbulan.pdf');
     }
 
     public function destroy($id)
