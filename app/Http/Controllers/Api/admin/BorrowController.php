@@ -54,7 +54,7 @@ class BorrowController extends Controller
             'borrowing_end.required' => 'Tanggal akhir pinjam wajib diisi.',
         ]);
 
-        $user = User::find($request->user_id);
+        $user = User::find($userId);
 
         if ($user->status != 'Aktif') {
             return response()->json(['message' => 'User belum aktif tidak dapat meminjam buku'], 403);
@@ -136,7 +136,7 @@ class BorrowController extends Controller
         }
 
         //return failed with Api Resource
-        return new BorrowResource(false, 'Detail Data borrow Tidak Ditemukan!', null);
+        return new BorrowResource(false, 'Detail Data Peminjaman Tidak Ditemukan!', null);
     }
 
     public function updateStatusBorrow($id)
