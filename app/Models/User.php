@@ -67,7 +67,7 @@ class User extends Authenticatable implements JWTSubject
     protected function image(): Attribute
     {
         return Attribute::make(
-            get: fn ($image) => asset('/storage/user/' . $image),
+            get: fn ($image) => asset('/storage/users/' . $image),
         );
     }
 

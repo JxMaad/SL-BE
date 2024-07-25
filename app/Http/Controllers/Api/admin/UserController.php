@@ -49,6 +49,7 @@ class UserController extends Controller
             'name'         => 'required',
             'email'        => 'required|unique:users',
             'password'     => 'required|confirmed',
+            'image'        => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             // 'roles'        => 'required',
         ]);
 
@@ -56,11 +57,25 @@ class UserController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        // Default dummy image name
+        $defaultImage = 'Dummy.png';
+
+        // Simpan gambar ke storage jika ada
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $image->storeAs('public/users', $image->hashName());
+            $imageName = $image->hashName();
+        } else {
+            // Use default dummy image if no image uploaded
+            $imageName = $defaultImage;
+        }
+
         // Create user
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => bcrypt($request->password),
+            'image'    => $imageName,
         ]);
 
         // Assign role to user
@@ -105,8 +120,9 @@ class UserController extends Controller
          */
         $validator = Validator::make($request->all(), [
             'name'           => 'sometimes',
-            'email'          => 'sometimes',
+            'email'          => 'sometimes|email|unique:users,email,' . $user->id,
             'password'       => 'sometimes|confirmed',
+            'image'          => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -115,28 +131,40 @@ class UserController extends Controller
 
         // Mengupdate data user lainnya
         if ($request->filled('name')) {
-            $user->update([
-                'name' => $request->name,
-            ]);
+            $user->name = $request->name;
         }
 
         if ($request->filled('email')) {
-            $user->update([
-                'email' => $request->email,
-            ]);
+            $user->email = $request->email;
         }
 
-        // Mengupdate password jika dimasukkan
         if ($request->filled('password')) {
-            $user->update([
-                'password' => bcrypt($request->password),
-            ]);
+            $user->password = bcrypt($request->password);
+        }
+
+        // Default dummy image name
+        $defaultImage = 'Dummy.png';
+
+        // Mengupdate gambar jika ada gambar baru diunggah
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama jika bukan gambar dummy
+            if ($user->image !== $defaultImage && Storage::exists('public/users/' . $user->image)) {
+                Storage::delete('public/users/' . $user->image);
+            }
+
+            // Simpan gambar baru
+            $image = $request->file('image');
+            $image->storeAs('public/users', $image->hashName());
+            $user->image = $image->hashName();
         }
 
         // Menyinkronkan peran pengguna jika dimasukkan
         if ($request->filled('roles')) {
             $user->syncRoles($request->roles);
         }
+
+        // Simpan perubahan
+        $user->save();
 
         // Mengembalikan respons sesuai keberhasilan atau kegagalan
         if ($user) {
@@ -183,6 +211,14 @@ class UserController extends Controller
         if (!$user) {
             // Jika user tidak ditemukan, kembalikan respons dengan Api Resource
             return new UserResource(false, 'Data User Tidak Ditemukan!', null);
+        }
+
+        // Default dummy image name
+        $defaultImage = 'Dummy.png';
+
+        // Menghapus gambar profil jika bukan gambar dummy
+        if ($user->image !== $defaultImage && Storage::exists('public/users/' . $user->image)) {
+            Storage::delete('public/users/' . $user->image);
         }
 
         // Menghapus user

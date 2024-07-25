@@ -41,7 +41,7 @@ class ReadController extends Controller
 
         // Simpan gambar ke storage
         $image = $request->file('image');
-        $image->storeAs('public/readbook', $image->hashName());
+        $image->storeAs('public/readbooks', $image->hashName());
 
         $readbook = Read::create([
             'title' => $request->input('title'),
@@ -102,11 +102,11 @@ class ReadController extends Controller
             // Jika ada gambar baru diunggah
             if ($request->hasFile('image')) {
                 //remove old image
-                Storage::disk('local')->delete('public/readbook/' . basename($readbook->image));
+                Storage::disk('local')->delete('public/readbooks/' . basename($readbook->image));
 
                 //uplod new image
                 $image = $request->file('image');
-                $image->storeAs('public/readbook', $image->hashName());
+                $image->storeAs('public/readbooks', $image->hashName());
             }
 
             //update new image
@@ -151,7 +151,7 @@ class ReadController extends Controller
         if ($readbook) {
             // Hapus gambar dari storage
             //remove image
-            Storage::disk('local')->delete('public/readbook/' . basename($readbook->image));
+            Storage::disk('local')->delete('public/readbooks/' . basename($readbook->image));
 
             // Hapus buku dari database
             if ($readbook->delete()) {

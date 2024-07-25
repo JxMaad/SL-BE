@@ -15,11 +15,15 @@ class UserTableSeeder extends Seeder
      */
     public function run(): void
     {
+        // Nama gambar dummy yang digunakan
+        $dummyImage = 'Dummy.png';
+
         //create data user
         User::create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('1234'),
+            'image' => $dummyImage,  // Set gambar dummy sebagai default
             'status' => 'Aktif'
         ]);
         
