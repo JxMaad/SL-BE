@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Admin\ExportUserController;
 use App\Http\Controllers\Api\admin\GuestBookController;
 use App\Http\Controllers\Api\Admin\ImportUserController;
 use App\Http\Controllers\Api\Admin\MemberController;
+use App\Http\Controllers\api\admin\ReadController;
 use App\Http\Controllers\api\admin\RestoreController;
 use App\Http\Controllers\api\admin\ReturncheckController;
 use App\Http\Controllers\api\admin\VerificationUserController;
@@ -99,4 +100,11 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/generateRestorePdf', [RestoreController::class, 'generateRestore'])->middleware(['permission:restores', 'role:admin|pustakawan']);
 
+    Route::prefix('readbook')->group(function () {
+        Route::get('/', [ReadController::class, 'readbookindex'])->middleware(['permission:read.index']);
+        Route::post('/create', [ReadController::class, 'readbookstore'])->middleware(['permission:read.create', 'role:admin|pustakawan']);
+        Route::get('/{id}', [ReadController::class, 'readbookshow'])->middleware(['permission:read.index']);
+        Route::post('/update/{id}', [ReadController::class, 'readbookupdate'])->middleware(['permission:read.edit', 'role:admin|pustakawan']);
+        Route::delete('/{id}', [ReadController::class, 'readbookdestroy'])->middleware(['permission:read.delete', 'role:admin|pustakawan']);
+    });
 });

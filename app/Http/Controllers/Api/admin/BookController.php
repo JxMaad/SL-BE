@@ -81,11 +81,11 @@ class BookController extends Controller
 
         if ($book) {
             //return success with Api Resource
-            return new BookResource(true, 'Data book Berhasil Disimpan!', $book);
+            return new BookResource(true, 'Data buku Berhasil Disimpan!', $book);
         }
 
         //return failed with Api Resource
-        return new BookResource(false, 'Data book Gagal Disimpan!', null);
+        return new BookResource(false, 'Data buku Gagal Disimpan!', null);
     }
 
     /**
@@ -101,11 +101,11 @@ class BookController extends Controller
 
         if ($book) {
             //return success with Api resource
-            return new BookResource(true, 'Detail Data book', $book);
+            return new BookResource(true, 'Detail Data buku', $book);
         }
 
         //return failed with Api Resource
-        return new BookResource(false, 'Detail Data book Tidak Ditemukan!', null);
+        return new BookResource(false, 'Detail Data buku Tidak Ditemukan!', null);
     }
 
     /**
@@ -186,11 +186,11 @@ class BookController extends Controller
         // check if the update was successful
         if ($book->wasChanged()) {
             // return success with Api Resource
-            return new BookResource(true, 'Data book Berhasil Diupdate!', $book);
+            return new BookResource(true, 'Data buku Berhasil Diupdate!', $book);
         }
 
         // return failed with Api Resource
-        return new BookResource(false, 'Data book Gagal Diupdate!', null);
+        return new BookResource(false, 'Data buku Gagal Diupdate!', null);
     }
 
     /**

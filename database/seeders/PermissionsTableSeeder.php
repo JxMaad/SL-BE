@@ -32,6 +32,10 @@ class PermissionsTableSeeder extends Seeder
         'guest.create',
         'guest.edit',
         'guest.delete',
+        'read.index',
+        'read.create',
+        'read.edit',
+        'read.delete',
     ];
 
     // Default permissions for different roles.
@@ -43,6 +47,7 @@ class PermissionsTableSeeder extends Seeder
         'users.index',
         'users.create',
         'users.edit',
+        'read.index',
     ];
 
     /**
@@ -84,6 +89,11 @@ class PermissionsTableSeeder extends Seeder
         Permission::create(['name' => 'guest.create', 'guard_name' => 'api']);
         Permission::create(['name' => 'guest.edit', 'guard_name' => 'api']);
         Permission::create(['name' => 'guest.delete', 'guard_name' => 'api']);
+
+        Permission::create(['name' => 'read.index', 'guard_name' => 'api']);
+        Permission::create(['name' => 'read.create', 'guard_name' => 'api']);
+        Permission::create(['name' => 'read.edit', 'guard_name' => 'api']);
+        Permission::create(['name' => 'read.delete', 'guard_name' => 'api']);
 
         // Assign permissions to roles
         $roles = Role::all();
