@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class ImportUserController extends Controller
+class ImportBookController extends Controller
 {
     public function importBook(Request $request)
     {

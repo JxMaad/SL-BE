@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\ExportBookController;
 use App\Http\Controllers\Api\Admin\ExportUserController;
 use App\Http\Controllers\Api\admin\GuestBookController;
+use App\Http\Controllers\Api\Admin\ImportBookController;
 use App\Http\Controllers\Api\Admin\ImportUserController;
 use App\Http\Controllers\Api\Admin\MemberController;
 use App\Http\Controllers\api\admin\ReadController;
@@ -61,7 +62,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{id}/update', [BookController::class, 'update'])->middleware(['permission:books.edit', 'role:admin|pustakawan']);
         Route::delete('/{id}', [BookController::class, 'destroy'])->middleware(['permission:books.delete', 'role:admin|pustakawan']);
         Route::put('/{id}/update-status', [BookController::class, 'updateStatusBook'])->middleware('permission:books.edit', 'role:admin|pustakawan');
-        Route::post('/import-book', [ImportUserController::class, 'importBook'])->middleware(['role:admin|pustakawan']);
+        Route::post('/import-book', [ImportBookController::class, 'importBook'])->middleware(['role:admin|pustakawan']);
     });
 
     Route::prefix('borrow')->group(function () {
